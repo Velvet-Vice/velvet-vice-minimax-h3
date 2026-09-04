@@ -1,0 +1,88 @@
+POSITION INTELLIGENCE — SHARED GEOMETRY TAXONOMY
+EXTENDED PARTICIPANT, ANATOMY AND CONTACT COMPOSER
+
+SCOPE
+- Support one to four clearly adult, consenting participants already visible in the reference image. Never add an off-frame or invented participant.
+- Assign stable participant identifiers `A`, `B`, `C` and `D` from first-frame screen position, depth and identity cues. Do not renumber them after motion begins.
+- For scenes with three or four participants, preserve every visible participant, but keep at most two concurrent action signatures active. Additional participants may remain stable, supportive or locally reactive rather than receiving a new major action.
+- Do not infer gender identity from appearance. User labels may be preserved as labels, while motion planning must use visible anatomy, geometry, reach and contact evidence.
+
+MIXED / FUTANARI ANATOMY RESOLUTION — HARD VISUAL LOCK
+ANATOMY RESOLUTION MUST PRECEDE POSITION OR ACTION
+- Resolve each participant independently before assigning roles, position names, actions or target openings.
+- Record separate evidence for feminine presentation, breasts, attached penis, vulva, anus, covered/occluded pelvic anatomy and user-provided labels.
+- Use the generation-control class `WOMAN` only when a feminine-presenting adult has compatible visible vulva evidence or a user label supported by the pixels, with no visible attached penis evidence.
+- Use the generation-control class `FUTANARI` when a feminine-presenting adult has a naturally attached visible or compatible partially visible penis. A visible vulva may coexist and must be recorded separately when supported.
+- Use `OTHER_ADULT_ANATOMY` when the visible configuration is neither WOMAN nor FUTANARI, and `UNCLEAR` whenever evidence is covered, cropped, merged or insufficient.
+- Feminine face, breasts, hips or clothing never cancel visible penis evidence; feminine face, breasts, wide hips and other feminine traits may coexist with a naturally attached penis. Feminine face, breasts, wide hips and other feminine traits may coexist with a naturally attached penis. A participant with breasts and a naturally attached penis must not be normalized into a vulva-only body.
+- A penis is assigned only through continuous attachment to the same participant's pelvis, visible base continuity, projection direction and shaft/glans evidence. Never transfer it between participants or reinterpret attached anatomy as a toy.
+- A user `futanari` label may disambiguate compatible partial penis evidence, but it may not invent anatomy in a fully hidden region.
+- For two futanari participants, and likewise for three or four, resolve every participant separately. It is valid for A, B, C or D each to retain their own attached penis.
+- Once confirmed, emit immutable ownership locks such as `A_PENIS_REMAINS_VISIBLE_AND_ATTACHED_TO_A_PELVIS`, `B_VULVA_REMAINS_OWNED_BY_B`, and equivalent C/D locks. Never erase, duplicate, transfer or redesign a confirmed anatomy feature. Later stages may not exchange it between participants.
+
+GENITAL EVIDENCE PRIORITY
+1. Clear visible attachment and form -> `CLEARLY_VISIBLE`; lock owner immediately.
+2. Partial compatible form with continuous pelvic attachment -> `PARTIAL`; preserve possible anatomy without replacing it.
+3. Compatible user label plus partial evidence -> `USER_LABEL_SUPPORTED_PARTIAL`.
+4. Cropped, covered, overlapped or genuinely ambiguous -> `UNCLEAR` or `OCCLUDED`; never resolve by stereotype.
+
+SIDE-SPECIFIC LIMB AND VISIBILITY REGISTRY
+- Record left and right hands, forearms, elbows, upper arms, legs and visible support limbs separately for each participant.
+- Each limb uses one state: `VISIBLE_FREE`, `VISIBLE_CONTACT`, `VISIBLE_SUPPORT`, `PARTIAL`, `OCCLUDED`, `OUT_OF_FRAME` or `UNCLEAR`.
+- A limb cannot be assigned to a new action while it is weight-bearing, maintaining an essential grip, actively used by another action or lacking a continuous visible route.
+- Preserve left/right identity through occlusion. A hidden hand may reappear only as the same hand connected to the same forearm path.
+
+POSITION SIGNATURE — COMPOSE GEOMETRY, DO NOT RELY ON A NAME
+For every participant record:
+- posture: `STANDING`, `KNEELING`, `SEATED`, `SUPINE`, `PRONE`, `SIDE_LYING`, `CROUCHED`, `BENT`, `PARTIAL`, `UNCLEAR`
+- torso orientation and lean: upright, forward, backward, lateral or unclear
+- pelvis orientation and height
+- planted/supporting points: feet, knees, hands, elbows, torso, back, hips, furniture or floor
+- movement freedom and required supports
+
+For every relevant participant pair record:
+- facing relation: `FACE_TO_FACE`, `SAME_DIRECTION`, `OPPOSITE_DIRECTIONS`, `PERPENDICULAR`, `SIDE_BY_SIDE`, `UNCLEAR`
+- vertical relation: `SAME_LEVEL`, `FIRST_ABOVE_SECOND`, `SECOND_ABOVE_FIRST`, `FIRST_LOWERED`, `SECOND_LOWERED`, `UNCLEAR`
+- depth relation: first in front, second in front, side-by-side, overlapping or unclear
+- pelvis relation: `ALIGNED`, `OFFSET`, `CROSSED`, `SEPARATED`, `OCCLUDED`, `UNCLEAR`
+- exact support relation and contact graph
+
+POSITION FAMILY
+Choose a broad family only when supported: `SOLO`, `UPRIGHT_FACE_TO_FACE`, `UPRIGHT_SAME_DIRECTION`, `ONE_UPRIGHT_ONE_LOWERED`, `SEATED_FACE_TO_FACE`, `SEATED_SAME_DIRECTION`, `KNEELING_FACE_TO_FACE`, `KNEELING_SAME_DIRECTION`, `MOUNTED_OR_RIDER`, `SUPINE_OVER_UNDER`, `PRONE_OVER_UNDER`, `SIDE_LYING_FACE_TO_FACE`, `SIDE_LYING_SAME_DIRECTION`, `SIDE_BY_SIDE`, `CROSSED_OR_SCISSOR`, `MULTI_PARTICIPANT_CUSTOM_GEOMETRY`, `CUSTOM_VISIBLE_GEOMETRY`, or `UNCLEAR`.
+
+POSITION NAME AS OPTIONAL ALIAS ONLY
+- Common names such as cowgirl, reverse rider, seated lap, standing rear alignment or side-lying may be retained as aliases only after the literal geometry is described.
+- A named position never proves an action class, active anatomy, target owner or vaginal/anal opening.
+- Unknown, hybrid or uncommon positions are valid when their posture, pairwise relations, support graph, pelvis geometry and contacts are described literally.
+
+CONTACT AND OPENING REGISTRY
+- Store each contact as source owner/body part -> target owner/object/surface with phase `NO_CONTACT`, `APPROACH`, `FIRST_CONTACT`, `ESTABLISHED`, `RHYTHMIC`, `RELEASING`, `ENDED` or `OCCLUDED`.
+- Store broad external surfaces separately from exact openings.
+- Exact opening values are `VAGINAL_OPENING`, `ANAL_OPENING` or `UNCLEAR`; external-only values remain `EXTERNAL_VULVA` or `EXTERNAL_ANUS`.
+- A position name, body overlap or rear/front alignment is never sufficient opening evidence.
+- Once a confident target opening and owner are established, later stages may not switch vaginal/anal classification or target owner.
+
+SCENE STABILITY AND MOVEMENT FREEDOM
+Record independently:
+- `support_stability`: `HIGH`, `MEDIUM`, `LOW` or `UNCLEAR`
+- `motion_freedom`: `HIGH`, `MEDIUM`, `LOW` or `UNCLEAR`
+- `occlusion_risk`: `LOW`, `MEDIUM`, `HIGH` or `UNCLEAR`
+- `identity_risk`: `LOW`, `MEDIUM`, `HIGH` or `UNCLEAR`
+- `camera_motion`: static/locked, moving or unclear
+- `camera_framing`: close, medium, full-body or custom
+
+CONFIDENCE AND LOCK
+- Give anatomy, limb ownership, pairwise geometry, position, contact and opening decisions separate 0–100 confidence values.
+- Low confidence never becomes certainty in a later stage.
+- If current contact and position confidence are at least 70, preserve them.
+- If confidence is below 70, preserve only visible postures, supports and contact facts; use `CUSTOM_VISIBLE_GEOMETRY` or `UNCLEAR` and allow only the smallest supported continuation.
+- Position transitions require a continuous path, retained support and enough detected duration. A clip uses at most one low-cost transition unless a deterministic workflow budget explicitly permits otherwise.
+
+ROLE AND COMPATIBILITY
+- Assign initiator, receiver, mutual and support roles from current contact, explicit request, visible anatomy, reachability, free limbs, support and camera visibility—not assumed gender.
+- Resolve all participants and ownership first, reserve primary action resources second, then consider one compatible secondary action.
+- If required anatomy, opening, limb path or support is hidden or uncertain, do not invent it. Continue established contact or use preparation, local reaction and rhythm variation instead.
+
+ACTION / POSITION SEPARATION
+- `MOUNTED_OR_RIDER`, `CROSSED_OR_SCISSOR` and all other position families describe body arrangement only.
+- Detect action class independently from the exact active effector, owner, target, opening, contact phase and movement driver.

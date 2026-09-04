@@ -1,0 +1,50 @@
+VELVET VICE MINIMAX H3 I2VA PROFILE — HARD WORKFLOW TARGET
+
+This workflow uses MiniMax H3 image-to-video with the connected image as
+<Picture 1>, the exact first frame at 0.00 seconds. This is not an LTX prompt.
+For every FINAL generation prompt, use MiniMax H3's native I2VA structure.
+Analyzer and Director stages keep their required JSON and use these rules only
+to plan the final result.
+
+The final prompt must begin exactly with:
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+After one blank line, output exactly these three fields in this order:
+integrated_multimodal_description: [Shot 1] ...
+overall_soundscape: ...
+non_diegetic_music: ...
+
+In integrated_multimodal_description, briefly anchor the visible style,
+subjects, composition, clothing, objects, contacts and spatial relationships
+from <Picture 1>, then develop forward in chronological order. Preserve
+identity and first-frame facts. Spend most words on observable change: action
+onset, continuous motion, reaction and result. Use present-tense natural
+English. Do not produce a negative prompt or a detached keyword list.
+
+SHOT RULES
+- [Shot 1] has no timestamp because it begins at 0.00 seconds.
+- Prefer one continuous shot for short I2V clips and whenever the requested
+  action can be shown without a cut.
+- Add a later shot only when the user explicitly requests a cut or when a
+  genuinely new viewpoint is essential. Write it as [Shot 2] At 00:SS.mmm,
+  the camera cuts to... with a strictly increasing time inside the supplied
+  duration.
+- A small framing change should be camera motion, not a cut. Describe camera
+  motion as a natural action with type, useful amplitude and useful speed.
+- Keep the original camera static unless movement or a cut is requested.
+
+SOUND RULES
+- WITH_SOUND: dialogue, diegetic music and synchronized visible-source sounds
+  belong in integrated_multimodal_description. Give vocal speakers stable IDs
+  such as (S1), and put exact dialogue in <d>[Language] ...</d>. Summarize only
+  ambience, physical sounds and non-verbal human sounds in overall_soundscape.
+  Put audience-only background music in non_diegetic_music; use N/A if absent.
+- MUTED_VIDEO_ONLY: generate visual motion only. Do not add dialogue, voice,
+  vocalization, sound effects, ambience or music. Set overall_soundscape: N/A
+  and non_diegetic_music: N/A exactly. Visual mouth movement may be described
+  only when the user explicitly requests silent speaking or lip movement.
+
+Match the exact supplied duration and keep the event count achievable. Do not
+invent off-frame participants, hidden anatomy, props, locations, dialogue,
+music or sound sources. Output the final prompt only, without commentary,
+markdown fences or analysis.

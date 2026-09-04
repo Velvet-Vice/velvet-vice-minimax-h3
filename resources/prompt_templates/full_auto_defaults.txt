@@ -1,0 +1,48 @@
+MODE: FULL_AUTO
+DURATION: AUTO — READ FROM H3 DIRECTOR
+DURATION CHOREOGRAPHY: AUTO — SAFE DEVELOPMENT BEATS
+SCENE COMPLEXITY: AUTO — DURATION BUDGET MODIFIER
+PARTICIPANT REGISTRY: AUTO — PRESERVE 1 TO 4 VISIBLE ADULTS
+ANATOMY CLASSIFICATION: WOMAN / FUTANARI / OTHER / UNCLEAR BEFORE ACTION
+CONTACT STATE MACHINE: ON
+GEOMETRY COMPOSER: LITERAL POSTURE + SUPPORT + PAIRWISE RELATIONS
+LEGACY FALLBACK: PRESERVE EXISTING PROVEN ACTION WHEN UNCERTAIN
+SCENE STYLE: passionate, explicit, physically natural and continuity-focused
+INTENSITY: PASSIONATE
+ACTION COMMITMENT: HIGH
+RHYTHM: STRONG CONTROLLED ESCALATION
+SOFT TISSUE PHYSICS: REALISTIC
+INERTIA: BODY-DRIVEN
+DAMPING: NATURAL
+RESPONSE SCALE: MOTION-MATCHED
+OSCILLATION LIMIT: SINGLE DAMPED SETTLE
+CONTACT DEFORMATION: ON
+CONTACT ANCHOR: SURFACE-LOCKED
+VOLUME PRESERVATION: ON
+GRAVITY RESPONSE: ON
+ENDING: CONTROLLED BY THE ENDING MODE SELECTOR
+CAMERA: PRESERVE
+VISIBLE NUDITY AUTO-TRIGGER: ON
+DIALOGUE: none unless clearly requested
+AUDIO: natural breathing, vocal reactions and environmental sound only; no music
+PERFORMANCE STYLE: LIFELIKE AND REACTIVE
+BODY LANGUAGE: WEIGHT-AWARE, ASYMMETRIC, CAUSAL
+FACIAL PERFORMANCE: CONTEXTUAL MICRO-REACTIONS
+MOTION TIMING: ORGANIC, NON-METRONOMIC
+AUDIO SYNC: ACTION-BOUND DIEGETIC
+SUPPORTING MOTION BUDGET: 1-2 RELEVANT CUES PER BEAT
+POSITION RECOGNITION: AUTO-DETECT FROM VISIBLE GEOMETRY
+POSITION MODE: PRESERVE CURRENT WHEN ACTIVE
+POSITION TRANSITION: MAXIMUM ONE LOW-COST TRANSITION
+ROLE ASSIGNMENT: GEOMETRY-BASED, ANATOMY-OWNER LOCKED
+MIXED ANATOMY RECOGNITION: STRICT LITERAL VISUAL EVIDENCE
+FUTANARI ANATOMY LOCK: PRESERVE BREASTS + ATTACHED PENIS PER OWNER
+PERSISTENT ANATOMY EXISTENCE: PRESENT_LOCKED SURVIVES OCCLUSION + RECEIVING ROLE
+OCCLUDED HAND COMPLETION: FORBIDDEN — PRESERVE VISIBLE SILHOUETTE
+ACTION CLASSIFICATION: SEPARATE EFFECTOR + TARGET FROM POSITION
+ACTION LOCK: PRESERVE MANUAL / ORAL / PENETRATIVE / OTHER CLASS
+POSITION VARIANT: AUTO-DETECT INDEPENDENTLY
+CONCURRENT ACTIONS: AUTO — ONE PRIMARY + ONE COMPATIBLE SECONDARY
+GENITAL REINTERPRETATION: FORBIDDEN
+
+The user has activated the separate graph-level confirmation that every depicted participant is 18 or older and consenting. The supported configuration may contain one to four adults already visible in the reference image with any visible adult anatomy or presentation. Treat the image as the literal first frame. Assign stable participants A through D as needed from visible screen position and identity cues; preserve their faces, hair, clothing, limbs, anatomy ownership, depth and support points. First resolve anatomy ownership, then detect the current position from independent geometry: each posture, facing direction, relative height, front/back order, pelvis relationship, support points and existing contact graph. Preserve an already active position instead of replacing it with a familiar alternative. If the position is neutral or uncertain, keep the visible postures and choose only the smallest physically reachable continuation. Assign initiator, receiver, active anatomy and target anatomy from existing contact, explicit request, visible compatibility, shortest continuous path, stable support and camera visibility—not from assumed gender. This includes solo scenes and any supported one-to-four-adult combination, including participants with similar or mixed visible anatomy. A feminine-presenting adult with breasts and a naturally attached visible penis is a valid futanari anatomy configuration: preserve the breasts and penis together, keep the penis attached to its original owner, and never replace it with a vulva-only body. For two or more futanari participants, resolve and lock each visible participant independently so every confirmed visible penis remains present. Treat anatomy existence separately from visibility: temporary body overlap, camera cropping, anal/vaginal receiving roles or an occluded pelvis never remove or relabel a `PRESENT_LOCKED` penis. A partially visible or occluded hand remains partial or occluded; never complete hidden fingers, add a sixth digit, duplicate a thumb or invent a new hand path. Never exchange, duplicate, erase, normalize or reinterpret anatomy. Independently classify the current or requested action from its active effector and exact target: hand-driven, mouth-driven, pelvis/anatomy-driven, body contact, visible object, preparation or unclear. A mounted/rider/cowgirl label describes position only and must never overwrite the action class. Preserve a confident manual, oral or other action exactly instead of converting it to a stereotypical alternative. Select one physically achievable primary adult action that best continues the image, with at most one compatible secondary action after resource validation. Use at most one low-cost position transition and only when duration and visible supports make every step achievable. Keep all existing image-fidelity, lifelike performance, physics, Ending Control and action-bound audio rules active.

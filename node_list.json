@@ -1,0 +1,32 @@
+{
+  "VelvetViceMiniMaxH3SystemHub": "Central MiniMax H3 backend, model, VAE and Turbo-LoRA configuration hub.",
+  "VelvetViceMiniMaxH3Director": "Primary MiniMax H3 render control for duration, resolution, seed, Turbo and native audio.",
+  "VelvetViceMiniMaxH3ProfileManager": "Persistent MiniMax H3 and LoRA profiles.",
+  "VelvetViceMiniMaxH3PromptDirector": "Vision-assisted MiniMax H3 prompt director.",
+  "VelvetViceMiniMaxH3FinalPromptPreview": "Displays the exact final MiniMax H3 prompt.",
+  "VelvetViceMiniMaxH3OllamaReleaseBarrier": "Releases Ollama before MiniMax H3 render models load.",
+  "VelvetViceMiniMaxH3SystemCheck": "MiniMax H3 RAM/VRAM and environment preflight.",
+  "VelvetViceMiniMaxH3ModelRouter": "Internal Native/GGUF H3 model router.",
+  "VelvetViceMiniMaxH3VAERouter": "Internal MiniMax H3 video/audio VAE router.",
+  "VelvetViceMiniMaxH3AudioGate": "Controls native MiniMax H3 audio output.",
+  "VelvetViceMiniMaxH3AudioDecodeGate": "Skips H3 audio VAE decoding in MUTED / VIDEO ONLY mode.",
+  "VelvetViceMiniMaxH3TurboDirector": "Applies a compatible H3 Turbo LoRA and selects effective sampling steps.",
+  "VelvetViceMiniMaxH3PowerLoraAV": "Ordered H3 audio/video LoRA stack.",
+  "VelvetViceMiniMaxH3LivePreview": "MiniMax H3 live sampler preview with LOW/MEDIUM/HIGH decoder tiers.",
+  "VelvetViceMiniMaxH3OutputHub": "MiniMax H3 preview, post-processing, watermark and project controls.",
+  "VelvetViceMiniMaxH3OutputStudio": "Final MiniMax H3 video encode and adaptive player.",
+  "VelvetViceMiniMaxH3GhostAnalyzer": "Temporal ghost analysis for H3 output frames.",
+  "VelvetViceMiniMaxH3TemporalAntiGhost": "Optional temporal ghost repair for H3 output frames.",
+  "VelvetViceMiniMaxH3WatermarkOverlay": "Internal H3 watermark processor.",
+  "VelvetViceMiniMaxH3ImageMemoryCheckpoint": "Internal H3 memory checkpoint.",
+  "VelvetViceMiniMaxH3SingleOutputCleanup": "Internal H3 final render cleanup.",
+  "VelvetViceMiniMaxH3CLIPLoader": "MiniMax H3 text encoder loader.",
+  "VelvetViceMiniMaxH3UNETLoader": "MiniMax H3 diffusion model loader.",
+  "VelvetViceMiniMaxH3VAELoader": "MiniMax H3 VAE loader.",
+  "VelvetViceMiniMaxH3OptionalTurboLora": "Optional standalone H3 Turbo LoRA loader.",
+  "VelvetViceMiniMaxH3ResolutionPlanner": "MiniMax H3 resolution planner.",
+  "VelvetViceMiniMaxH3LivePreviewBridge": "Compatibility bridge for H3 live preview.",
+  "VelvetViceMiniMaxH3LivePreviewDisplay": "Compatibility display for H3 live preview."
+  ,"VelvetViceMiniMaxH3Preflight": "Read-only H3 backend, model, encoder and VAE preflight monitor."
+  ,"VelvetViceMiniMaxH3RenderTimer": "Current-node, H3-core, total and last-render runtime monitor."
+}

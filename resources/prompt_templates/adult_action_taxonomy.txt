@@ -1,0 +1,145 @@
+ACTION INTELLIGENCE — SHARED ACTION / POSITION SEPARATION
+
+PURPOSE
+- Never confuse an action with a body position. An action describes WHAT creates the contact; a position describes HOW the bodies are arranged.
+- Examples of parsing only: a hand-based act is MANUAL regardless of standing, kneeling or mounted geometry; a mouth-based act is ORAL regardless of position; a rider/cowgirl label is a POSITION VARIANT and does not by itself identify the active contact class.
+- Classify from visible contact evidence first, then explicit user wording, then physically supported continuation. Never infer an exact act only from nudity or anatomy.
+
+ACTION SIGNATURE — REQUIRED FIELDS
+- `action_class`: `NONE`, `PREPARATION`, `MANUAL`, `ORAL`, `PENETRATIVE`, `GENITAL_CONTACT`, `BODY_CONTACT`, `TOY_ASSISTED`, `CUSTOM_VISIBLE_CONTACT`, or `UNCLEAR`.
+- `active_effector`: exact owner and visible body part or object creating the action, such as `A_LEFT_HAND`, `B_MOUTH`, `A_PELVIS_ACTIVE_ANATOMY`, or `VISIBLE_OBJECT`.
+- `target_owner`: `A`, `B`, `SELF`, `OBJECT`, or `UNCLEAR`.
+- `target_surface`: visible target region only, such as `PENIS`, `VULVA`, `ANUS`, `BREAST`, `TORSO`, `BUTTOCK`, `THIGH`, `MOUTH`, `HAND`, `OBJECT`, or `UNCLEAR`.
+- `target_opening`: exact opening classification kept separate from the broad surface: `NONE`, `EXTERNAL_VULVA`, `VAGINAL_OPENING`, `EXTERNAL_ANUS`, `ANAL_OPENING`, or `UNCLEAR`.
+- `target_opening_owner`: `A`, `B`, `SELF`, or `UNCLEAR`.
+- `target_opening_confidence`: 0–100 based on visible geometry, approach axis and compatible explicit wording.
+- `target_opening_evidence`: short visible evidence list; never use a position name alone.
+- `target_opening_lock`: canonical opening and owner that later stages must preserve without switching vaginal/anal target mid-clip.
+- `contact_phase`: `NO_CONTACT`, `APPROACH`, `FIRST_CONTACT`, `SUSTAINED_CONTACT`, `RHYTHMIC_CONTACT`, `TRANSITION`, or `OCCLUDED`.
+- `role_map`: explicit initiator, receiver and mutual/support roles using stable A/B/C/D identifiers.
+- `movement_driver`: hand/forearm, head/neck, pelvis/torso, whole-body, object, or unclear.
+- `motion_axis`: visible movement direction and range; do not invent hidden penetration depth or unseen contact.
+- `action_confidence`: 0–100 based on visible evidence and explicit user instruction.
+- `action_evidence`: short list of visible contact, alignment, limb path and user-label evidence.
+- `action_lock`: one exact canonical signature that every later stage must preserve.
+
+CANONICAL DISTINCTION RULES
+1. MANUAL
+- Requires a visible or conservatively reachable hand as active effector.
+- Hand-to-penis, hand-to-vulva, hand-to-breast and other manual targets remain separate through `target_surface`.
+- Never relabel a manual action as oral or penetrative merely because the participants are close.
+
+2. ORAL
+- Requires the active participant's mouth/head path to align with the visible target and suitable neck/support geometry.
+- Mouth-to-penis and mouth-to-vulva remain separate through `target_surface`.
+- A lowered head near the pelvis is not sufficient by itself; confirm mouth alignment or keep PREPARATION/UNCLEAR.
+
+3. PENETRATIVE
+- Requires a visible compatible active anatomy or object, a visible compatible target, pelvis alignment, support and a continuous reachable contact path.
+- Store source owner, source anatomy/object, target owner, broad target surface and exact target opening separately.
+- Distinguish `VAGINAL_OPENING` from `ANAL_OPENING`. External vulva or anus contact is not penetration and must remain `EXTERNAL_VULVA` or `EXTERNAL_ANUS`.
+- Use visible relative placement, pelvis orientation, approach axis, contact point and compatible explicit wording as evidence. A front-facing, rear-facing, mounted or rider position never proves the opening by itself.
+- If the opening is hidden or cannot be distinguished, use `UNCLEAR` and preserve the visible action as preparation or occluded contact instead of inventing vaginal or anal penetration.
+- Once a confident opening is established, never switch openings during the same short clip.
+- Do not infer penetration from overlapping bodies, mounted posture, occlusion or a familiar position name alone.
+
+4. GENITAL_CONTACT
+- Use for clearly visible genital-to-genital contact that is not confidently penetrative.
+- Preserve both anatomy owners independently, especially with two mixed/futanari participants.
+
+5. BODY_CONTACT
+- Use for body-to-body contact without a more specific manual, oral, penetrative or genital-contact signature.
+
+6. TOY_ASSISTED
+- Use only when a separate visible object or explicit user instruction identifies the object. Never reinterpret attached anatomy as a toy.
+
+7. PREPARATION / UNCLEAR
+- Use PREPARATION when the intended class is supported but contact is not yet established.
+- Use UNCLEAR when the visible evidence cannot distinguish classes. Do not force a more explicit label.
+
+USER WORDING NORMALIZATION
+- Treat common act names as hints that map to the signature, not as substitutes for geometry.
+- A hand-based named act maps to `MANUAL` with the named or visible target.
+- A mouth-based named act maps to `ORAL` with the named or visible target.
+- A rider/cowgirl or reverse-rider label maps to a mounted POSITION VARIANT; determine the action class independently from visible contact and anatomy.
+- When user wording conflicts with the visible first frame, preserve the image as the starting state and plan only a reachable transition. Do not rewrite anatomy or teleport contact to satisfy the label.
+
+POSITION VARIANTS — INDEPENDENT FROM ACTION
+- Extend the broad position family with one optional `position_variant`: `RIDER_ABOVE_FACE_TO_FACE`, `RIDER_ABOVE_SAME_DIRECTION`, `UPRIGHT_REAR_ALIGNED`, `UPRIGHT_FRONT_ALIGNED`, `ONE_LOWERED_HEAD_TO_PELVIS`, `SEATED_OVER_LAP`, `SUPINE_PARTNER_ABOVE`, `PRONE_PARTNER_ABOVE`, `SIDE_LYING_REAR_ALIGNED`, `SIDE_LYING_FACE_TO_FACE`, `CROSSED_PELVIS_ALIGNMENT`, `CUSTOM_VISIBLE_GEOMETRY`, or `UNCLEAR`.
+- A position variant never overrides the literal posture, support graph, depth order or contact graph.
+- Mounted/rider geometry does not automatically mean penetration. Oral or manual contact can occur in many positions; classify the action separately.
+
+CLASSIFICATION ORDER
+1. Resolve A/B/C/D identity and anatomy ownership for every visible participant.
+2. Reconstruct posture, orientation, depth, supports and contact graph.
+3. Detect the active effector and exact visible target.
+4. Assign action_class and broad target_surface.
+5. Resolve target_opening independently when the action or request requires an opening.
+6. Assign independent position_family and position_variant.
+7. Score confidence and lock the exact combination.
+8. Only then plan motion, reactions, sound and ending.
+
+ANTI-REGRESSION LOCK
+- If `action_confidence >= 70`, later stages must not change action_class, active_effector, source owner, target owner, target_surface, target_opening, target_opening_owner or position_variant.
+- If `target_opening_confidence >= 70`, later stages must preserve vaginal versus anal classification exactly and may not convert external contact into penetration.
+- If the evidence supports MANUAL, do not rewrite it as ORAL or PENETRATIVE.
+- If the evidence supports ORAL, do not rewrite it as MANUAL or PENETRATIVE.
+- If the evidence supports a mounted/rider position, preserve the position while independently preserving the detected action.
+- If confidence is below 70, retain PREPARATION, CUSTOM_VISIBLE_CONTACT or UNCLEAR rather than choosing a stereotypical act.
+
+CONCURRENT ACTION GRAPH — ONE PRIMARY + ONE LINKED SECONDARY
+PURPOSE
+- Support physically compatible simultaneous actions without turning the clip into uncontrolled choreography.
+- Keep one dominant primary action that defines pose, support, main rhythm and camera readability. Permit at most one secondary action that uses an independent free effector and a clearly reachable target.
+- A mounted/rider primary action may coexist with a manual secondary action when a free visible hand can reach a separate compatible target without breaking support, ownership, target-opening or motion-axis locks. The same general rule applies to other physically compatible pairs.
+
+REQUIRED CONCURRENCY FIELDS
+- `action_slot`: `PRIMARY` or `SECONDARY`.
+- `concurrency_mode`: `SINGLE`, `PRIMARY_PLUS_SECONDARY`, `MUTUAL_LINKED`, or `UNCLEAR`.
+- `resource_lock`: every used hand, mouth, pelvis/active anatomy, object, support limb and target reserved by each action.
+- `entry_timing`: when the secondary begins relative to the stabilized primary action.
+- `coordination_relation`: `SAME_RHYTHM`, `PHASE_OFFSET`, `SUPPORTIVE`, or `INDEPENDENT_LOCAL`.
+- `conflict_reason`: empty when compatible; otherwise the exact ownership, reach, support, target or timing conflict.
+
+COMPATIBILITY RULES
+1. Preserve any two clearly visible simultaneous actions already present in the first frame when their owners and targets can be identified confidently.
+2. Add a secondary action only after the primary pose and contact are stable. Never start both from unrelated positions at the same instant.
+3. The secondary must use an unused effector. A hand required for weight-bearing, balance or an existing grip is not free.
+4. Each effector, target and target opening remains attached to its original owner. A secondary action may not steal the primary action's active anatomy, hand, mouth, object or required support point.
+5. Maintain separate action signatures and separate target-opening locks for primary and secondary. Never let the secondary change the primary vaginal/anal classification or target owner.
+6. Use one clear dominant motion axis. The secondary may use a smaller local rhythm or brief supportive movement, preferably with a slight phase offset instead of perfectly synchronized robotic timing.
+7. Reject combinations that require hidden anatomy, an invented or unregistered participant, impossible reach, crossed ownership, two incompatible pelvis axes, two hands that do not exist, support loss, target switching or more than one position transition.
+8. If compatibility is uncertain, keep the primary action and omit the secondary. Stability is more important than maximizing action count.
+9. Never add more than two concurrent action signatures in a short clip.
+
+PENIS RESOURCE STATE MACHINE — HARD PRIMARY PRESERVATION
+- Track every confirmed participant-owned penis separately as `ABSENT`, `FREE_VISIBLE`, `NOT_FREE_UNCERTAIN`, `ENGAGED_PRIMARY`, `ENGAGED_SECONDARY`, `ENGAGED_CONTACT`, `OCCLUDED` or `UNCLEAR`.
+- A penis that is the active effector of an established primary penetrative action is `ENGAGED_PRIMARY`. Its participant owner, attachment, motion axis, target owner, target opening and contact phase are immutable for the clip.
+- `ENGAGED_PRIMARY` anatomy is not a free target. It may not receive a new handjob, self-manual action, oral action, alternate penetration, grip assignment or replacement role. Do not make it disappear, detach, smooth over, withdraw or become idle merely to create a secondary action.
+- Only a penis explicitly classified `FREE_VISIBLE` and listed in `FREE_MANUAL_PENIS_TARGETS` may be considered for a newly introduced manual penis secondary. Partial, occluded, uncertain, already contacted or already active anatomy is forbidden as a new target.
+- A free hand alone is insufficient. New manual action requires both an unused reachable hand and an independently `FREE_VISIBLE` target resource.
+- In mounted/rider penetration, preserve the inserted/engaged penis as the primary active anatomy and preserve the rider motion around that established contact. A separate free penis may be considered independently; the engaged one may not.
+- If no free target exists, retain the primary action and use rhythm, grip on non-genital support surfaces, weight, expression and body-tension variation instead of inventing self-stimulation.
+
+RESOURCE-ALLOCATION ORDER
+1. Lock participant identity, anatomy ownership, current contact and target openings.
+2. Reserve primary active effector, target, pelvis axis and required supports.
+3. Identify genuinely free effectors and reachable secondary targets.
+4. Validate continuous approach path and first contact for the secondary.
+5. Schedule secondary entry after primary stabilization.
+6. Preserve both signatures through Writer and Validator without merging them into one vague action.
+
+
+
+MULTI-PARTICIPANT ACTION RESOURCE GRAPH
+- The participant registry may contain A, B, C and D, but the active graph still permits only one primary and at most one compatible secondary action. This is a model-stability limit, not a limit on visible participant count.
+- Every action edge must contain `source_owner`, `active_effector`, `target_owner`, `target_surface`, optional `target_opening`, contact phase, motion axis and resource locks.
+- Participants not assigned to an active action retain their visible pose, identity, anatomy, supports and contacts. They may contribute one local reaction or support only when already visible and conflict-free.
+- Never treat a third or fourth participant as an anonymous extra. They require their own anatomy class, limbs, support state, pairwise geometry and contact edges.
+- Reserve resources globally across all participants: each hand, mouth, active anatomy, target opening, object, support limb and contact patch may be used only by its registered owner and one compatible purpose at a time.
+- If several possible action edges compete, preserve existing contact first, then the highest-confidence shortest path. Remove lower-priority additions rather than disturbing the established graph.
+
+CONTACT STATE MACHINE
+- Every new contact develops through `NO_CONTACT -> APPROACH -> FIRST_CONTACT -> ESTABLISHED -> RHYTHMIC` and may later move through `RELEASING -> ENDED`.
+- Do not jump directly from NO_CONTACT to RHYTHMIC, and do not relocate an established contact without release and a continuous route.
+- During `OCCLUDED`, preserve owner, side, target patch and phase internally; occlusion is not permission to reset or swap the contact.
