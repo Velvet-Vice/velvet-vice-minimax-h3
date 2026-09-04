@@ -43,19 +43,17 @@ https://civitai.red/models/2837571/minimax-h3-turbo-loras?modelVersionId=3275758
 
 `Turbo LoRA AVAILABLE/READY` means that the file was detected. The LoRA is only applied when **Turbo is enabled in the H3 Director**. Match `Turbo Steps` to the LoRA you downloaded; for example, a 4-step Turbo LoRA can be used at 4 steps.
 
-## Optional live-preview decoder
-
-Optional file:
-
-`models/vae_approx/taeh3_decoder.safetensors`
+## Live-preview decoder
 
 Preview tiers:
 
 - **LOW** — latent2rgb; no extra decoder required
-- **AUTO / MEDIUM** — TAEHV when installed, otherwise latent2rgb fallback
+- **AUTO / MEDIUM** — uses the H3 TAEHV decoder when available; if it is missing, Velvet Vice downloads it automatically on first use, verifies its SHA256 and stores it in `models/vae_approx/taeh3_decoder.safetensors`
 - **HIGH** — full MiniMax H3 video VAE, with fallback chain
 
-The portable release includes `_INSTALL_H3_PREVIEW_TAEHV.cmd` for the optional decoder.
+The automatic TAEHV download is lazy: nothing is fetched when ComfyUI starts. It is triggered only when AUTO/MEDIUM live preview actually needs the decoder. If the download fails, the render continues and the preview falls back to latent2rgb.
+
+Existing decoder files are never overwritten automatically. The portable release may still include `_INSTALL_H3_PREVIEW_TAEHV.cmd` as a manual fallback.
 
 ## Workflow dependencies
 
