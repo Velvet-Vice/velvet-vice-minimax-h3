@@ -1,0 +1,157 @@
+name: Prepare exact Registry 1.4.4 synchronization
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/prepare_release_144.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Apply version-only 1.4.4 synchronization
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import json
+
+          OLD = "1.4.3"
+          NEW = "1.4.4"
+          NODE_ID = "velvet-vice-minimax-h3"
+
+          def replace_exact(path, old, new, expected_min=1):
+              p = Path(path)
+              text = p.read_text(encoding="utf-8")
+              count = text.count(old)
+              if count < expected_min:
+                  raise SystemExit(f"Expected at least {expected_min} occurrence(s) of {old!r} in {path}, found {count}")
+              p.write_text(text.replace(old, new), encoding="utf-8")
+              print(f"updated {path}: {count} replacement(s)")
+
+          # Runtime/package release metadata only. No behavioral code changes.
+          replace_exact("version.py", 'PACK_VERSION = "1.4.3"', 'PACK_VERSION = "1.4.4"')
+          replace_exact("services/templates.py", "2026.09-v1.4.3-minimax-h3-native-i2va", "2026.09-v1.4.4-minimax-h3-native-i2va")
+          replace_exact("services/taeh3_auto.py", "VelvetViceMiniMaxH3/1.4.3", "VelvetViceMiniMaxH3/1.4.4")
+          replace_exact("web/minimax_h3_workspace.js", 'const PACK_VERSION = "1.4.3";', 'const PACK_VERSION = "1.4.4";')
+          replace_exact("web/zzzzzzzzzzzzz_velvet_vice_suite_v1115.js", 'const PACK_VERSION = "1.4.3";', 'const PACK_VERSION = "1.4.4";')
+          replace_exact("web/zzzzzzzzzzzzz_velvet_vice_suite_v1115.js", 'const OUTPUT_STUDIO_VERSION = "1.4.3-h3-standalone";', 'const OUTPUT_STUDIO_VERSION = "1.4.4-h3-standalone";')
+          replace_exact("web/zzzzzzzzzzzzzzz_minimax_h3_live_preview_v140.js", 'const VERSION = "1.4.3-native-resize";', 'const VERSION = "1.4.4-native-resize";')
+
+          # Current-release documentation references.
+          replace_exact("README.md", OLD, NEW)
+          replace_exact("REGISTRY_PUBLISHING.md", OLD, NEW)
+
+          # Keep 1.4.3 history; prepend a 1.4.4 synchronization note.
+          changelog = Path("CHANGELOG.md")
+          text = changelog.read_text(encoding="utf-8")
+          if "## 1.4.4" not in text:
+              heading = "# Changelog\n"
+              block = (
+                  "\n## 1.4.4\n\n"
+                  "- Registry synchronization release built from the restored canonical Civitai 1.4.3 master.\n"
+                  "- No model, sampler, prompting, workflow-logic, UI-behavior, audio, VAE, preview, or finishing changes.\n"
+                  "- Release/version metadata synchronized to 1.4.4 for a clean Comfy Registry package.\n"
+              )
+              if text.startswith(heading):
+                  text = heading + block + text[len(heading):]
+              else:
+                  text = block + "\n" + text
+              changelog.write_text(text, encoding="utf-8")
+
+          # Reference workflow: preserve structure/values and change release-version strings only.
+          src = Path("workflow_examples/VELVET_VICE_MINIMAX_H3_I2V_v1.4.3.json")
+          dst = Path("workflow_examples/VELVET_VICE_MINIMAX_H3_I2V_v1.4.4.json")
+          data = json.loads(src.read_text(encoding="utf-8"))
+          registry_count = 0
+
+          def walk(obj):
+              global registry_count
+              if isinstance(obj, dict):
+                  props = obj.get("properties")
+                  if isinstance(props, dict) and props.get("cnr_id") == NODE_ID:
+                      props["ver"] = NEW
+                      registry_count += 1
+                  for key, value in list(obj.items()):
+                      obj[key] = walk(value)
+                  return obj
+              if isinstance(obj, list):
+                  return [walk(v) for v in obj]
+              if isinstance(obj, str):
+                  return obj.replace(OLD, NEW)
+              return obj
+
+          data = walk(data)
+          if registry_count != 23:
+              raise SystemExit(f"Expected exactly 23 H3 Registry references, found {registry_count}")
+
+          extra = data.get("extra")
+          if not isinstance(extra, dict):
+              raise SystemExit("Workflow extra metadata is missing")
+          extra["velvet_vice_version"] = NEW
+          extra["velvet_vice_h3_architecture"] = NEW
+          release = extra.get("velvet_vice_release")
+          if isinstance(release, dict):
+              release["version"] = NEW
+              release["source_workflow"] = "VELVET_VICE_MINIMAX_H3_I2V_v1.4.4"
+          extra["velvet_vice_ui_audit"] = "v1.4.4-static-ui-native-resize"
+
+          dst.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+          src.unlink()
+
+          # pyproject is the Registry trigger. It is changed in the same atomic release commit,
+          # after all other files have already been normalized in the working tree.
+          replace_exact("pyproject.toml", 'version = "1.4.3"', 'version = "1.4.4"')
+          PY
+
+      - name: Validate synchronized release
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m compileall -q .
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          p = Path("workflow_examples/VELVET_VICE_MINIMAX_H3_I2V_v1.4.4.json")
+          data = json.loads(p.read_text(encoding="utf-8"))
+          refs = []
+          def walk(x):
+              if isinstance(x, dict):
+                  props = x.get("properties")
+                  if isinstance(props, dict) and props.get("cnr_id") == "velvet-vice-minimax-h3":
+                      refs.append(props.get("ver"))
+                  for v in x.values(): walk(v)
+              elif isinstance(x, list):
+                  for v in x: walk(v)
+          walk(data)
+          assert len(refs) == 23, len(refs)
+          assert set(refs) == {"1.4.4"}, set(refs)
+          assert data["extra"]["velvet_vice_version"] == "1.4.4"
+          assert Path("version.py").read_text(encoding="utf-8").splitlines()[0] == 'PACK_VERSION = "1.4.4"'
+          assert 'version = "1.4.4"' in Path("pyproject.toml").read_text(encoding="utf-8")
+          print("1.4.4 metadata validation passed; 23/23 Registry refs synchronized")
+          PY
+          for f in web/*.js; do node --check "$f" >/dev/null; done
+          echo "All JavaScript syntax checks passed"
+
+      - name: Commit synchronized 1.4.4 and remove helper
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "Velvet Vice"
+          git config user.email "daagle42@googlemail.com"
+          rm -f .github/workflows/prepare_release_144.yml
+          git add -A
+          git diff --cached --check
+          git commit -m "Publish canonical MiniMax H3 1.4.4"
+          git push
