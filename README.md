@@ -8,7 +8,7 @@ This repository is MiniMax H3-only. The public node IDs, workflow metadata, UI, 
 
 The included reference workflow is:
 
-`workflow_examples/VELVET_VICE_MINIMAX_H3_I2V_v1.4.3.json`
+`workflow_examples/VELVET_VICE_MINIMAX_H3_I2V_v1.4.4.json`
 
 ## Main features
 
@@ -90,7 +90,7 @@ Restart ComfyUI afterwards.
 
 - Publisher: `velvet-vice`
 - Node ID: `velvet-vice-minimax-h3`
-- Version: `1.4.3`
+- Version: `1.4.4`
 - Display name: `VELVET VICE — MiniMax H3`
 
 Repository target:

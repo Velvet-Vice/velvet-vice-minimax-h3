@@ -62,7 +62,7 @@ def ensure_taeh3_decoder() -> tuple[bool, str]:
         temp = target.with_name(f"{target.name}.download-{os.getpid()}-{threading.get_ident()}")
         try:
             logging.info("VELVET VICE H3 PREVIEW | TAEHV decoder missing; downloading verified preview decoder.")
-            request = Request(TAEH3_URL, headers={"User-Agent": "VelvetViceMiniMaxH3/1.4.3"})
+            request = Request(TAEH3_URL, headers={"User-Agent": "VelvetViceMiniMaxH3/1.4.4"})
             total = 0
             with urlopen(request, timeout=60) as response, temp.open("wb") as handle:
                 while True:

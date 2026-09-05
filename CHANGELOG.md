@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.4
+
+- Registry synchronization release built from the restored canonical Civitai 1.4.3 master.
+- No model, sampler, prompting, workflow-logic, UI-behavior, audio, VAE, preview, or finishing changes.
+- Release/version metadata synchronized to 1.4.4 for a clean Comfy Registry package.
+
 ## 1.4.3 — 2026-09-05
 
 Synchronization and ComfyUI frontend compatibility release.

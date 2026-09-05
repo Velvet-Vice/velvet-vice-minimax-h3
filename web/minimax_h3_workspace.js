@@ -9,7 +9,7 @@ const TURBO = "VelvetViceMiniMaxH3TurboDirector";
 const OUTPUT_HUB = "VelvetViceMiniMaxH3OutputHub";
 const OUTPUT_STUDIO = "VelvetViceMiniMaxH3OutputStudio";
 const WATERMARK_NODE = "VelvetViceMiniMaxH3WatermarkOverlay";
-const PACK_VERSION = "1.4.3";
+const PACK_VERSION = "1.4.4";
 
 // H3-only Director visual runtime. This is deliberately isolated from the
 // H3-scoped design system; color changes remain local to this package.
