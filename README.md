@@ -6,9 +6,7 @@ Standalone Velvet Vice custom-node package for **MiniMax H3 FL2VA image-to-video
 
 This repository is MiniMax H3-only. The public node IDs, workflow metadata, UI, guides, HTTP routes and Comfy Registry package use the standalone ID `velvet-vice-minimax-h3`.
 
-The current public/Civitai v1.4.3 workflow should carry `cnr_id = "velvet-vice-minimax-h3"` and `ver = "1.4.3"` on all Velvet Vice H3 nodes so Missing Nodes resolves the current Registry package.
-
-The synchronized GitHub reference workflow is:
+The included reference workflow is:
 
 `workflow_examples/VELVET_VICE_MINIMAX_H3_I2V_v1.4.3.json`
 
@@ -30,9 +28,7 @@ The synchronized GitHub reference workflow is:
 - Watermark controls integrated into the H3 Finishing Hub
 - Final memory cleanup and runtime telemetry
 - Automatic PNG export decoded from the actual saved video's terminal frame, with a non-fatal tensor fallback
-- Static Midnight-Violet / Obsidian H3 UI with no idle color cycling or repaint timer
-- Native ComfyUI growable DOM-widget resizing for the large H3 control panels
-- Full-panel chrome guard to prevent duplicate native title/chrome space on custom DOM panels
+- Modern animated violet/blue/turquoise-green styling across every workflow node, with freely resizable control surfaces
 - Strict runtime isolation from the separate Velvet Vice Zen MiniMax H3 package
 - Unified Preflight/Timer visual construction across the complete large-H3 workflow
 - Guided 01 → 07 workflow layout with inline Quick Guides
@@ -47,17 +43,19 @@ https://civitai.red/models/2837571/minimax-h3-turbo-loras?modelVersionId=3275758
 
 `Turbo LoRA AVAILABLE/READY` means that the file was detected. The LoRA is only applied when **Turbo is enabled in the H3 Director**. Match `Turbo Steps` to the LoRA you downloaded; for example, a 4-step Turbo LoRA can be used at 4 steps.
 
-## Live-preview decoder
+## Optional live-preview decoder
+
+Optional file:
+
+`models/vae_approx/taeh3_decoder.safetensors`
 
 Preview tiers:
 
 - **LOW** — latent2rgb; no extra decoder required
-- **AUTO / MEDIUM** — uses the H3 TAEHV decoder when available; if it is missing, Velvet Vice downloads it automatically on first use, verifies its SHA256 and stores it in `models/vae_approx/taeh3_decoder.safetensors`
+- **AUTO / MEDIUM** — TAEHV when installed, otherwise latent2rgb fallback
 - **HIGH** — full MiniMax H3 video VAE, with fallback chain
 
-The automatic TAEHV download is lazy: nothing is fetched when ComfyUI starts. It is triggered only when AUTO/MEDIUM live preview actually needs the decoder. If the download fails, the render continues and the preview falls back to latent2rgb.
-
-Existing decoder files are never overwritten automatically. The portable release may still include `_INSTALL_H3_PREVIEW_TAEHV.cmd` as a manual fallback.
+The portable release includes `_INSTALL_H3_PREVIEW_TAEHV.cmd` for the optional decoder.
 
 ## Workflow dependencies
 
@@ -74,13 +72,11 @@ The Velvet Vice custom nodes themselves are distributed by this repository.
 
 ### Comfy Registry / Manager
 
-Install:
+Once published to the Comfy Registry, install:
 
 `velvet-vice-minimax-h3`
 
-Then restart ComfyUI and load the workflow.
-
-A Registry/Manager install is tracked as a concrete semantic version. A manual Git clone is intentionally shown by ComfyUI Manager as `nightly` because it is a Git checkout rather than a Registry package.
+Then restart ComfyUI and load the workflow example.
 
 ### Manual GitHub installation
 
@@ -89,8 +85,6 @@ Clone or copy this repository into:
 `ComfyUI/custom_nodes/velvet-vice-minimax-h3`
 
 Restart ComfyUI afterwards.
-
-Use only one copy of the package in `custom_nodes`; old legacy folders such as `ComfyUI-Velvet-Vice-MiniMax-H3` should be removed to avoid duplicate loading and incomplete Manager uninstall behavior.
 
 ## Registry
 
@@ -101,8 +95,4 @@ Use only one copy of the package in `custom_nodes`; old legacy folders such as `
 
 Repository target:
 
-https://github.com/Velvet-Vice/velvet-vice-minimax-h3
-
-## Publishing updates
-
-This repository includes `.github/workflows/publish_action.yml` for Comfy Registry publishing. Add a GitHub Actions repository secret named `REGISTRY_ACCESS_TOKEN` containing the Registry publishing API key for publisher `velvet-vice`. See `REGISTRY_PUBLISHING.md` for the release checklist.
+https://github.com/Velvet-Vice/ComfyUI-Velvet-Vice-MiniMax-H3
