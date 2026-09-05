@@ -6,11 +6,7 @@ Standalone Velvet Vice custom-node package for **MiniMax H3 FL2VA image-to-video
 
 This repository is MiniMax H3-only. The public node IDs, workflow metadata, UI, guides, HTTP routes and Comfy Registry package use the standalone ID `velvet-vice-minimax-h3`.
 
-The included GitHub reference workflow remains:
-
-`workflow_examples/VELVET_VICE_MINIMAX_H3_I2V_v1.4.0.json`
-
-The public/Civitai v1.4.1 workflow should carry `cnr_id = "velvet-vice-minimax-h3"` and `ver = "1.4.1"` on all Velvet Vice H3 nodes so Missing Nodes resolves the current Registry package.
+The current public/Civitai v1.4.2 workflow should carry `cnr_id = "velvet-vice-minimax-h3"` and `ver = "1.4.2"` on all Velvet Vice H3 nodes so Missing Nodes resolves the current Registry package.
 
 ## Main features
 
@@ -30,7 +26,9 @@ The public/Civitai v1.4.1 workflow should carry `cnr_id = "velvet-vice-minimax-h
 - Watermark controls integrated into the H3 Finishing Hub
 - Final memory cleanup and runtime telemetry
 - Automatic PNG export decoded from the actual saved video's terminal frame, with a non-fatal tensor fallback
-- Modern animated violet/blue/turquoise-green styling across every workflow node, with freely resizable control surfaces
+- Static Midnight-Violet / Obsidian H3 UI with no idle color cycling or repaint timer
+- Native ComfyUI growable DOM-widget resizing for the large H3 control panels
+- Full-panel chrome guard to prevent duplicate native title/chrome space on custom DOM panels
 - Strict runtime isolation from the separate Velvet Vice Zen MiniMax H3 package
 - Unified Preflight/Timer visual construction across the complete large-H3 workflow
 - Guided 01 → 07 workflow layout with inline Quick Guides
@@ -78,6 +76,8 @@ Install:
 
 Then restart ComfyUI and load the workflow.
 
+A Registry/Manager install is tracked as a concrete semantic version. A manual Git clone is intentionally shown by ComfyUI Manager as `nightly` because it is a Git checkout rather than a Registry package.
+
 ### Manual GitHub installation
 
 Clone or copy this repository into:
@@ -86,11 +86,13 @@ Clone or copy this repository into:
 
 Restart ComfyUI afterwards.
 
+Use only one copy of the package in `custom_nodes`; old legacy folders such as `ComfyUI-Velvet-Vice-MiniMax-H3` should be removed to avoid duplicate loading and incomplete Manager uninstall behavior.
+
 ## Registry
 
 - Publisher: `velvet-vice`
 - Node ID: `velvet-vice-minimax-h3`
-- Version: `1.4.1`
+- Version: `1.4.2`
 - Display name: `VELVET VICE — MiniMax H3`
 
 Repository target:
