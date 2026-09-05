@@ -39,15 +39,11 @@ from .minimax_h3_public import (
     VelvetViceMiniMaxH3TemporalAntiGhost,
 )
 
-# Lazy TAEHV bootstrap for AUTO/MEDIUM live preview.
-# The preview module keeps its normal latent2rgb fallback behavior; this wrapper
-# only makes the optional decoder self-installing the first time it is needed.
 import logging as _logging
 from . import minimax_h3_preview as _h3_preview_module
 from ..services.taeh3_auto import ensure_taeh3_decoder as _ensure_taeh3_decoder
 
 _original_taeh3_loader = _h3_preview_module._load_taeh3v_vae
-
 
 def _load_taeh3v_vae_with_auto_install():
     if _h3_preview_module._select_taeh3v_filename() is None:
@@ -55,12 +51,8 @@ def _load_taeh3v_vae_with_auto_install():
         if installed:
             _logging.info("VELVET VICE H3 PREVIEW | %s", detail)
         else:
-            _logging.warning(
-                "VELVET VICE H3 PREVIEW | %s Falling back to latent2rgb.",
-                detail,
-            )
+            _logging.warning("VELVET VICE H3 PREVIEW | %s Falling back to latent2rgb.", detail)
     return _original_taeh3_loader()
-
 
 _h3_preview_module._load_taeh3v_vae = _load_taeh3v_vae_with_auto_install
 
