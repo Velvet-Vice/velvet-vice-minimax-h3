@@ -39,3 +39,5 @@ jobs:
           git add -A
           git commit -m "Restore exact Civitai 1.4.3 canonical design system"
           git push
+
+# retry after verified chunk hashes
