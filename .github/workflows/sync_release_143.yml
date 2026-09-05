@@ -1,0 +1,190 @@
+name: Synchronize MiniMax H3 1.4.3
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/sync_release_143.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  synchronize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Normalize release 1.4.3
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          import re
+
+          VERSION = "1.4.3"
+          ROOT = Path('.')
+
+          def replace(path, old, new):
+              p = ROOT / path
+              text = p.read_text(encoding='utf-8')
+              if old not in text:
+                  raise RuntimeError(f"Expected text not found in {path}: {old}")
+              p.write_text(text.replace(old, new), encoding='utf-8')
+
+          # Release-bearing Python metadata.
+          replace('version.py', 'PACK_VERSION = "1.4.2"', f'PACK_VERSION = "{VERSION}"')
+          replace('services/templates.py', '2026.09-v1.4.2-minimax-h3-native-i2va', f'2026.09-v{VERSION}-minimax-h3-native-i2va')
+          replace('services/taeh3_auto.py', 'VelvetViceMiniMaxH3/1.4.2', f'VelvetViceMiniMaxH3/{VERSION}')
+
+          # Frontend release markers. Internal *_v140 filenames/IDs intentionally
+          # stay stable so existing ComfyUI installs do not load duplicate scripts.
+          replace('web/zzzzzzzzzzzzz_velvet_vice_suite_v1115.js', 'const PACK_VERSION = "1.4.0";', f'const PACK_VERSION = "{VERSION}";')
+          replace('web/zzzzzzzzzzzzz_velvet_vice_suite_v1115.js', 'const OUTPUT_STUDIO_VERSION = "1.4.0-h3-standalone";', f'const OUTPUT_STUDIO_VERSION = "{VERSION}-h3-standalone";')
+          replace('web/minimax_h3_workspace.js', 'const PACK_VERSION = "1.4.0";', f'const PACK_VERSION = "{VERSION}";')
+          p = ROOT / 'web/minimax_h3_workspace.js'
+          p.write_text(p.read_text(encoding='utf-8').replace('older v1.4.0 workflow copies', 'older workflow copies'), encoding='utf-8')
+          replace('web/zzzzzzzzzzzzzzz_minimax_h3_live_preview_v140.js', 'const VERSION = "1.4.0-fpssync1";', f'const VERSION = "{VERSION}-native-resize";')
+
+          # README: concrete current release + concrete reference workflow.
+          readme = (ROOT / 'README.md').read_text(encoding='utf-8')
+          readme = readme.replace('v1.4.2', f'v{VERSION}').replace('`1.4.2`', f'`{VERSION}`').replace('ver = "1.4.2"', f'ver = "{VERSION}"')
+          marker = 'The current public/Civitai'
+          workflow_line = f'\nThe synchronized GitHub reference workflow is:\n\n`workflow_examples/VELVET_VICE_MINIMAX_H3_I2V_v{VERSION}.json`\n'
+          if workflow_line.strip() not in readme:
+              idx = readme.find('\n## Main features')
+              readme = readme[:idx] + workflow_line + readme[idx:]
+          (ROOT / 'README.md').write_text(readme, encoding='utf-8')
+
+          # Registry publishing guide must describe the release actually being published.
+          registry = (ROOT / 'REGISTRY_PUBLISHING.md').read_text(encoding='utf-8')
+          registry = registry.replace('Version: `1.4.1`', f'Version: `{VERSION}`')
+          registry = registry.replace('v1.4.1', f'v{VERSION}').replace('`1.4.1`', f'`{VERSION}`').replace('ver = "1.4.1"', f'ver = "{VERSION}"')
+          (ROOT / 'REGISTRY_PUBLISHING.md').write_text(registry, encoding='utf-8')
+
+          # Changelog keeps historical entries and prepends the fully synchronized release.
+          changelog = (ROOT / 'CHANGELOG.md').read_text(encoding='utf-8')
+          section = f'''# Changelog\n\n## {VERSION} — 2026-09-05\n\nSynchronization and ComfyUI frontend compatibility release.\n\n### Fixed\n\n- Large H3 DOM panels now use ComfyUI's growable widget layout instead of competing fixed-height resize callbacks.\n- Removed dead resize space and the uncontrolled vertical growth caused by mixed `computeSize` / `computeLayoutSize` handling.\n- Static Midnight-Violet / Obsidian node styling and full-panel chrome guard are included in the Registry package.\n- All public and embedded H3 workflow nodes, including the internal Audio Decode Gate inside the subgraph, carry the same Registry version.\n- GitHub reference workflow, Registry package metadata and portable release use one canonical release number.\n- Canonical Manager install folder remains `velvet-vice-minimax-h3`; legacy duplicate folders are documented as cleanup-only compatibility paths.\n\n### Registry metadata\n\n- Publisher: `velvet-vice`\n- Node ID: `velvet-vice-minimax-h3`\n- Version: `{VERSION}`\n\n'''
+          if not changelog.startswith(f'# Changelog\n\n## {VERSION}'):
+              changelog = section + changelog[len('# Changelog\n\n'):]
+          (ROOT / 'CHANGELOG.md').write_text(changelog, encoding='utf-8')
+
+          # Rebuild the GitHub reference workflow from the existing official graph,
+          # preserving links/settings while applying the UI-audit geometry and every
+          # Registry marker recursively (including nodes inside subgraph definitions).
+          old_path = ROOT / 'workflow_examples/VELVET_VICE_MINIMAX_H3_I2V_v1.4.0.json'
+          if not old_path.exists():
+              candidates = sorted((ROOT / 'workflow_examples').glob('VELVET_VICE_MINIMAX_H3_I2V_v*.json'))
+              if not candidates:
+                  raise RuntimeError('No H3 reference workflow found')
+              old_path = candidates[0]
+          workflow = json.loads(old_path.read_text(encoding='utf-8'))
+
+          def walk(value):
+              if isinstance(value, dict):
+                  props = value.get('properties')
+                  if isinstance(props, dict) and props.get('cnr_id') == 'velvet-vice-minimax-h3':
+                      props['ver'] = VERSION
+                  for item in value.values():
+                      walk(item)
+              elif isinstance(value, list):
+                  for item in value:
+                      walk(item)
+          walk(workflow)
+
+          # Known-good default geometry from the audited portable workflow.
+          sizes = {
+              3730:[700,900], 2196:[760,700], 4035:[840,780], 4036:[840,120],
+              4043:[900,570], 4038:[390,330], 4039:[700,60], 4042:[700,60],
+              4044:[700,500], 4045:[700,250], 4051:[700,60], 5006:[750,610],
+              5007:[750,60], 5010:[690,950], 5011:[720,960], 5012:[690,450],
+              5013:[750,60], 5015:[360,60], 5016:[750,60], 5017:[980,620],
+              5021:[680,405], 5022:[520,285],
+          }
+          positions = {
+              3730:[6230,940], 2196:[6990,940], 4035:[3260,940], 4036:[3260,1920],
+              4043:[3260,2070], 4038:[3260,2680], 4039:[6230,3530], 4042:[6230,3370],
+              4044:[6230,1880], 4045:[6230,2440], 4051:[6230,3290], 5006:[4260,1030],
+              5007:[4260,1650], 5010:[1020,1420], 5011:[2450,940], 5012:[1020,940],
+              5013:[4260,940], 5015:[5770,2190], 5016:[4260,1740], 5017:[5150,1540],
+              5021:[1020,120], 5022:[1740,120],
+              3746:[6230,3050], 3748:[6230,3210], 3731:[6230,2750], 3747:[6230,3130],
+              2182:[6230,3450], 4046:[6230,4450],
+          }
+          for node in workflow.get('nodes', []):
+              nid = node.get('id')
+              if nid in sizes:
+                  node['size'] = sizes[nid]
+              if nid in positions:
+                  node['pos'] = positions[nid]
+              if nid == 2366:
+                  node['title'] = f'VELVET VICE — MINIMAX H3 I2V · v{VERSION}'
+                  node['widgets_values'] = [f'VELVET VICE — MINIMAX H3 I2V · v{VERSION}']
+
+          extra = workflow.setdefault('extra', {})
+          release = extra.setdefault('velvet_vice_release', {})
+          release['version'] = VERSION
+          release['source_workflow'] = f'VELVET_VICE_MINIMAX_H3_I2V_v{VERSION}'
+          extra['velvet_vice_version'] = VERSION
+          extra['velvet_vice_h3_architecture'] = VERSION
+          extra['velvet_vice_ui_audit'] = f'v{VERSION}-static-ui-native-resize'
+
+          new_path = ROOT / f'workflow_examples/VELVET_VICE_MINIMAX_H3_I2V_v{VERSION}.json'
+          new_path.write_text(json.dumps(workflow, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+          for stale in (ROOT / 'workflow_examples').glob('VELVET_VICE_MINIMAX_H3_I2V_v*.json'):
+              if stale != new_path:
+                  stale.unlink()
+
+          # Final release version is changed last so the normal publish workflow
+          # can only package the already-normalized repository state.
+          pyproject = (ROOT / 'pyproject.toml').read_text(encoding='utf-8')
+          pyproject, count = re.subn(r'(?m)^version\s*=\s*"[^"]+"', f'version = "{VERSION}"', pyproject, count=1)
+          if count != 1:
+              raise RuntimeError('Could not update project version exactly once')
+          (ROOT / 'pyproject.toml').write_text(pyproject, encoding='utf-8')
+
+          # Self-remove: this is a one-shot synchronization workflow.
+          sync_file = ROOT / '.github/workflows/sync_release_143.yml'
+          if sync_file.exists():
+              sync_file.unlink()
+          PY
+
+      - name: Validate synchronized repository
+        shell: bash
+        run: |
+          python -m compileall -q nodes services .
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('workflow_examples/VELVET_VICE_MINIMAX_H3_I2V_v1.4.3.json')
+          data = json.loads(p.read_text(encoding='utf-8'))
+          found = []
+          def walk(v):
+              if isinstance(v, dict):
+                  props = v.get('properties')
+                  if isinstance(props, dict) and props.get('cnr_id') == 'velvet-vice-minimax-h3':
+                      found.append((v.get('type'), props.get('ver')))
+                  for x in v.values(): walk(x)
+              elif isinstance(v, list):
+                  for x in v: walk(x)
+          walk(data)
+          assert len(found) == 23, found
+          assert all(ver == '1.4.3' for _, ver in found), found
+          assert data['extra']['velvet_vice_release']['version'] == '1.4.3'
+          print('Validated H3 Registry references:', len(found))
+          PY
+          for file in web/*.js; do node --check "$file"; done
+
+      - name: Commit synchronized release
+        shell: bash
+        run: |
+          git config user.name "Velvet Vice"
+          git config user.email "daagle42@googlemail.com"
+          git add -A
+          git commit -m "Synchronize MiniMax H3 1.4.3 release"
+          git push origin main
