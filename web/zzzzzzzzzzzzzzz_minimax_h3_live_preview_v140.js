@@ -3,7 +3,7 @@ import { api } from "../../scripts/api.js";
 
 const DISPLAY_TYPE = "VelvetViceMiniMaxH3LivePreview";
 const EVENT_NAME = "velvet_vice.h3_live_preview";
-const VERSION = "1.4.0-fpssync1";
+const VERSION = "1.4.3-native-resize";
 const DEFAULT_NODE_WIDTH = 980;
 const DEFAULT_NODE_HEIGHT = 620;
 const MIN_NODE_WIDTH = 720;

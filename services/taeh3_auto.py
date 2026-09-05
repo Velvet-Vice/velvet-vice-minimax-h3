@@ -89,7 +89,7 @@ def ensure_taeh3_decoder() -> tuple[bool, str]:
             )
             request = Request(
                 TAEH3_URL,
-                headers={"User-Agent": "VelvetViceMiniMaxH3/1.4.2"},
+                headers={"User-Agent": "VelvetViceMiniMaxH3/1.4.3"},
             )
             total = 0
             with urlopen(request, timeout=60) as response, temp.open("wb") as handle:

@@ -9,7 +9,7 @@ const TURBO = "VelvetViceMiniMaxH3TurboDirector";
 const OUTPUT_HUB = "VelvetViceMiniMaxH3OutputHub";
 const OUTPUT_STUDIO = "VelvetViceMiniMaxH3OutputStudio";
 const WATERMARK_NODE = "VelvetViceMiniMaxH3WatermarkOverlay";
-const PACK_VERSION = "1.4.0";
+const PACK_VERSION = "1.4.3";
 
 // H3-only Director visual runtime. This is deliberately isolated from the
 // H3-scoped design system; color changes remain local to this package.
@@ -399,7 +399,7 @@ function installOutputHub(node) {
         const wm=findNode(WATERMARK_NODE);const wmWidget=widget(wm,"watermark_file");const wmValues=wmWidget?.options?.values;if(Array.isArray(wmValues)&&!wmValues.includes(clean))wmValues.push(clean);
     };
     // The workflow carries this value through a real graph link. The mirror is
-    // retained only for compatibility with older v1.4.0 workflow copies.
+    // retained only for compatibility with older workflow copies.
     const syncWatermarkFile=()=>{const selected=String(value(node,"watermark_file","Velvet_Vice_Watermark.png")||"Velvet_Vice_Watermark.png");ensureWatermarkOption(selected);watermarkFile.control.value=selected;const wm=findNode(WATERMARK_NODE);if(wm)setValue(wm,"watermark_file",selected,false);};
     const updateWatermarkState=()=>{
         const enabled=!!value(node,"watermark",false);const file=String(value(node,"watermark_file","Velvet_Vice_Watermark.png")||"Velvet_Vice_Watermark.png");const pos=String(value(node,"watermark_position","bottom-right")||"bottom-right");

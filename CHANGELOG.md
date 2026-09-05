@@ -1,5 +1,24 @@
 # Changelog
 
+## 1.4.3 — 2026-09-05
+
+Synchronization and ComfyUI frontend compatibility release.
+
+### Fixed
+
+- Large H3 DOM panels now use ComfyUI's growable widget layout instead of competing fixed-height resize callbacks.
+- Removed dead resize space and the uncontrolled vertical growth caused by mixed `computeSize` / `computeLayoutSize` handling.
+- Static Midnight-Violet / Obsidian node styling and full-panel chrome guard are included in the Registry package.
+- All public and embedded H3 workflow nodes, including the internal Audio Decode Gate inside the subgraph, carry the same Registry version.
+- GitHub reference workflow, Registry package metadata and portable release use one canonical release number.
+- Canonical Manager install folder remains `velvet-vice-minimax-h3`; legacy duplicate folders are documented as cleanup-only compatibility paths.
+
+### Registry metadata
+
+- Publisher: `velvet-vice`
+- Node ID: `velvet-vice-minimax-h3`
+- Version: `1.4.3`
+
 ## 1.4.1 — 2026-09-05
 
 Registry update focused on zero-extra-step live preview installation.

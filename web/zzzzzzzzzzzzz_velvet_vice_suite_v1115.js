@@ -10,7 +10,7 @@ const RENDER_ENGINE_TYPE = "7df62195-cb50-4fb2-bd93-7bcfde31b12d";
 const MINIMAX_PROMPT_DIRECTOR_TYPE = "VelvetViceMiniMaxH3PromptDirector";
 const MINIMAX_FINAL_PROMPT_TYPE = "VelvetViceMiniMaxH3FinalPromptPreview";
 const WATERMARK_TYPE = "VelvetViceMiniMaxH3WatermarkOverlay";
-const PACK_VERSION = "1.4.0";
+const PACK_VERSION = "1.4.3";
 
 const liveOutputs = new Set();
 const outputStudioMedia = new Set();
@@ -67,7 +67,7 @@ const liveEngines = new Set();
 let globalListenersInstalled = false;
 let styleInstalled = false;
 const PANEL_STYLE_ID = "vv-h3-panel-suite-v140";
-const OUTPUT_STUDIO_VERSION = "1.4.0-h3-standalone";
+const OUTPUT_STUDIO_VERSION = "1.4.3-h3-standalone";
 const CABLE_SAFE_TYPES = new Set([
     HUB_TYPE,
     PREFLIGHT_TYPE,

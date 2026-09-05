@@ -1,6 +1,6 @@
 [project]
 name = "velvet-vice-minimax-h3"
-version = "1.4.2"
+version = "1.4.3"
 description = "Velvet Vice MiniMax H3 image-to-video custom nodes, guided workflow UI, Turbo LoRA control, live preview and finishing tools."
 license = { file = "LICENSE" }
 requires-python = ">=3.10"

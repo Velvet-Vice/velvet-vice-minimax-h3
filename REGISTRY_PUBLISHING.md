@@ -4,7 +4,7 @@ This repository is prepared for the Velvet Vice publisher account.
 
 - Publisher ID: `velvet-vice`
 - Node ID: `velvet-vice-minimax-h3`
-- Version: `1.4.1`
+- Version: `1.4.3`
 - Repository: `https://github.com/Velvet-Vice/velvet-vice-minimax-h3`
 
 ## First GitHub publication
@@ -35,7 +35,7 @@ Before publishing a new version, update all version-bearing locations that are i
 - JavaScript package/version constants when they are release-specific
 - README / changelog / release notes
 
-For the public/Civitai v1.4.1 workflow, use:
+For the public/Civitai v1.4.3 workflow, use:
 
 - `cnr_id = "velvet-vice-minimax-h3"`
-- `ver = "1.4.1"`
+- `ver = "1.4.3"`
