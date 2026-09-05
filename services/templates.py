@@ -2,7 +2,7 @@ from functools import lru_cache
 from pathlib import Path
 
 
-TEMPLATE_VERSION = "2026.09-v1.4.0-minimax-h3-native-i2va"
+TEMPLATE_VERSION = "2026.09-v1.4.1-minimax-h3-native-i2va"
 TEMPLATE_DIRECTORY = (
     Path(__file__).resolve().parent.parent
     / "resources"
