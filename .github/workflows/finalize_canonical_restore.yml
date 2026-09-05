@@ -20,7 +20,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cat .restore_tmp/design_00.b64 .restore_tmp/design_01.b64 .restore_tmp/design_02.b64 .restore_tmp/design_03.b64 .restore_tmp/design_04.b64 | tr -d '\n\r' | base64 -d > web/00_velvet_vice_design_system_v1115_drag_safe.js
+          : > web/00_velvet_vice_design_system_v1115_drag_safe.js
+          for f in .restore_tmp/design_00.b64 .restore_tmp/design_01.b64 .restore_tmp/design_02.b64 .restore_tmp/design_03.b64 .restore_tmp/design_04.b64; do
+            tr -cd 'A-Za-z0-9+/=' < "$f" | base64 -d >> web/00_velvet_vice_design_system_v1115_drag_safe.js
+          done
           echo "326d8a01ba6f49aeabcca0078889b179126f5a8cb881a960dab4ba2b7d6f07a3  web/00_velvet_vice_design_system_v1115_drag_safe.js" | sha256sum -c -
           node --check web/00_velvet_vice_design_system_v1115_drag_safe.js
 
