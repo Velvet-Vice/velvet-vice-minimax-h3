@@ -8,7 +8,7 @@ This repository is MiniMax H3-only. The public node IDs, workflow metadata, UI, 
 
 The included reference workflow is:
 
-`workflow_examples/VELVET_VICE_MINIMAX_H3_I2V_v1.4.4.json`
+`workflow_examples/VELVET_VICE_MINIMAX_H3_I2V_v1.4.5.json`
 
 ## Main features
 
@@ -16,8 +16,13 @@ The included reference workflow is:
 - Automatic native/GGUF Qwen text-encoder routing in one selector
 - Native ComfyUI video/audio VAE routing; the audio VAE is skipped in `MUTED · VIDEO ONLY`
 - H3 System Hub and H3 Director
+- **Quality Refine / Second Sampler integrated into H3 System Hub**
+- Quality Refine is **OFF by default** and uses a true lazy bypass when disabled
+- Refine Steps remain directly user-controlled in LIGHT, HIGH and CUSTOM modes
+- LIGHT uses denoise `0.12`; HIGH uses `0.20`; CUSTOM exposes denoise `0.01–0.35`
+- Optional **Preserve Base Audio** keeps pass-1 audio while pass 2 refines the video latent
+- H3-native I2VA Vision / Prompt Director with persistent mode across workflow switches
 - VELVET VICE H3 Preflight and live Render Timer monitors
-- H3-native I2VA Vision / Prompt Director with first-frame anchoring, structured audiovisual fields and Ollama release barrier
 - `WITH SOUND` / `MUTED · VIDEO ONLY` propagated through prompting, VAE loading, decoding and final output
 - Persistent H3 and LoRA profiles
 - Power LoRA AV stack
@@ -28,20 +33,32 @@ The included reference workflow is:
 - Watermark controls integrated into the H3 Finishing Hub
 - Final memory cleanup and runtime telemetry
 - Automatic PNG export decoded from the actual saved video's terminal frame, with a non-fatal tensor fallback
-- Modern animated violet/blue/turquoise-green styling across every workflow node, with freely resizable control surfaces
+- **Static Midnight Violet / Obsidian styling** across the H3 workflow; execution no longer recolors node bars green/teal
+- Freely resizable control surfaces
 - Strict runtime isolation from the separate Velvet Vice Zen MiniMax H3 package
-- Unified Preflight/Timer visual construction across the complete large-H3 workflow
 - Guided 01 → 07 workflow layout with inline Quick Guides
+
+## Quality Refine / Second Sampler
+
+Quality Refine runs after the primary H3 sampling pass and before final VAE decode.
+
+- **OFF** — default; pass 2 is not executed
+- **LIGHT** — user-selected Refine Steps, denoise `0.12`
+- **HIGH** — user-selected Refine Steps, denoise `0.20`
+- **CUSTOM** — user-selected Refine Steps `1–16`, denoise `0.01–0.35`
+- **Preserve Base Audio ON** — final audio remains from pass 1 while pass 2 refines video
+
+The second pass uses the same effective H3 model/conditioning with `res_multistep + simple`.
 
 ## Strongly recommended — Turbo LoRA
 
-MiniMax H3 works in Base mode, but a compatible Turbo LoRA is strongly recommended because it can reduce the sampling cost dramatically.
+MiniMax H3 works in Base mode, but a compatible Turbo LoRA is strongly recommended because it can reduce sampling cost dramatically.
 
 Turbo LoRAs on Civitai:
 
 https://civitai.red/models/2837571/minimax-h3-turbo-loras?modelVersionId=3275758
 
-`Turbo LoRA AVAILABLE/READY` means that the file was detected. The LoRA is only applied when **Turbo is enabled in the H3 Director**. Match `Turbo Steps` to the LoRA you downloaded; for example, a 4-step Turbo LoRA can be used at 4 steps.
+`Turbo LoRA AVAILABLE/READY` means that the file was detected. The LoRA is only applied when **Turbo is enabled in the H3 Director**. Match `Turbo Steps` to the LoRA you downloaded.
 
 ## Optional live-preview decoder
 
@@ -55,24 +72,13 @@ Preview tiers:
 - **AUTO / MEDIUM** — TAEHV when installed, otherwise latent2rgb fallback
 - **HIGH** — full MiniMax H3 video VAE, with fallback chain
 
-The portable release includes `_INSTALL_H3_PREVIEW_TAEHV.cmd` for the optional decoder.
-
-## Workflow dependencies
-
-The workflow also uses standard/external ComfyUI nodes for supporting tasks, including:
-
-- MiniMax H3 support from current ComfyUI core
-- VideoHelperSuite (`VHS_PruneOutputs` and final video encoding backend)
-- ComfyUI-VFI (`RIFEInterpolation`) when the optional 48 FPS finishing path is used
-- rgthree nodes for decorative labels/bookmark in the supplied workflow
-
-The Velvet Vice custom nodes themselves are distributed by this repository.
+The portable release includes `_INSTALL_H3_PREVIEW_TAEHV.cmd`.
 
 ## Installation
 
 ### Comfy Registry / Manager
 
-Once published to the Comfy Registry, install:
+Install:
 
 `velvet-vice-minimax-h3`
 
@@ -90,9 +96,5 @@ Restart ComfyUI afterwards.
 
 - Publisher: `velvet-vice`
 - Node ID: `velvet-vice-minimax-h3`
-- Version: `1.4.4`
+- Version: `1.4.5`
 - Display name: `VELVET VICE — MiniMax H3`
-
-Repository target:
-
-https://github.com/Velvet-Vice/ComfyUI-Velvet-Vice-MiniMax-H3
