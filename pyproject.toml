@@ -17,3 +17,5 @@ Documentation = "https://github.com/Velvet-Vice/velvet-vice-minimax-h3#readme"
 [tool.comfy]
 PublisherId = "velvet-vice"
 DisplayName = "VELVET VICE — MiniMax H3"
+
+# Registry publish trigger: 1.4.4
