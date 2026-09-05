@@ -13,9 +13,10 @@ Registry update focused on zero-extra-step live preview installation.
 
 ### Updated
 
-- Workflow and Registry metadata normalized to `1.4.1`
-- Frontend/package version markers normalized to `1.4.1`
-- Live-preview Quick Guide updated to reflect automatic TAEHV setup
+- Registry/package version raised to `1.4.1`
+- Prompt-template/version markers raised to `1.4.1`
+- Public/Civitai workflow metadata prepared for `ver = "1.4.1"`
+- Live-preview documentation updated to reflect automatic TAEHV setup
 
 ## 1.4.0 — 2026-09-05
 
