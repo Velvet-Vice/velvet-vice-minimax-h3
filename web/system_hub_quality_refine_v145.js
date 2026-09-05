@@ -1,7 +1,11 @@
 import { app } from "../../scripts/app.js";
 
 const TYPE = "VelvetViceMiniMaxH3SystemHub";
-
+const STORE = "velvetVice.h3.qualityRefine.v145";
+const FIELDS = [
+  "quality_refine_enabled","quality_refine_mode","quality_refine_custom_steps",
+  "quality_refine_custom_denoise","quality_refine_preserve_audio"
+];
 function typeOf(node){ return String(node?.comfyClass ?? node?.type ?? ""); }
 function widget(node,name){ return node?.widgets?.find((w)=>w?.name===name); }
 function value(node,name,fallback=null){ const w=widget(node,name); return w==null?fallback:w.value; }
@@ -9,6 +13,18 @@ function setValue(node,name,v){
   const w=widget(node,name); if(!w)return;
   w.value=v; w.callback?.(v);
   node.graph?.setDirtyCanvas?.(true,true); node.setDirtyCanvas?.(true,true);
+}
+function saveLocal(node){
+  try{
+    const data={}; for(const n of FIELDS)data[n]=value(node,n,null);
+    localStorage.setItem(STORE,JSON.stringify(data));
+  }catch(_){}
+}
+function restoreLocal(node){
+  try{
+    const data=JSON.parse(localStorage.getItem(STORE)||"{}");
+    for(const n of FIELDS)if(Object.prototype.hasOwnProperty.call(data,n))setValue(node,n,data[n]);
+  }catch(_){}
 }
 function sectionByTitle(shell,title){
   return [...shell.querySelectorAll(".vvh3-section")].find((s)=>
@@ -56,6 +72,7 @@ function install(node,retries=0){
   if(!shell){if(retries<40)setTimeout(()=>install(node,retries+1),75);return;}
   if(!widget(node,"quality_refine_enabled"))return;
   node.__vvQualityRefineV145Installed=true;
+  restoreLocal(node);
 
   for(const name of [
     "quality_refine_enabled","quality_refine_mode","quality_refine_custom_steps",
@@ -101,8 +118,8 @@ function install(node,retries=0){
       ? `ON · ${m} · PASS 2: ${s} steps · denoise ${Number(d).toFixed(2)} · ${value(node,"quality_refine_preserve_audio",true)?"BASE AUDIO PRESERVED":"JOINT AV REFINE"}`
       : "OFF · second sampler is lazy-bypassed · only Sampler 1 runs";
   };
-  refine.addEventListener("input",()=>setTimeout(sync,0));
-  refine.addEventListener("change",()=>setTimeout(sync,0));
+  refine.addEventListener("input",()=>{saveLocal(node);setTimeout(sync,0);});
+  refine.addEventListener("change",()=>{saveLocal(node);setTimeout(sync,0);});
   sync();
 
   node.setSize?.([Math.max(690,node.size?.[0]??0),Math.max(1030,node.size?.[1]??0)]);

@@ -19,7 +19,6 @@ from .minimax_h3_control import (
     VelvetViceMiniMaxH3ProfileManager,
     VelvetViceMiniMaxH3VAERouter,
 )
-# v1.4.5 overrides the public System Hub symbol with the tested Quality Refine extension.
 from .system_hub_quality_refine_v145 import VelvetViceMiniMaxH3SystemHub
 from .minimax_h3_preview import (
     VelvetViceMiniMaxH3LivePreview,
@@ -43,6 +42,7 @@ from .quality_refine import (
     VelvetViceMiniMaxH3AVRefineMerge,
     VelvetViceMiniMaxH3LatentRefineSwitch,
 )
+from . import prompt_state_routes_v145 as _prompt_state_routes_v145  # route registration side effect
 
 import logging as _logging
 from . import minimax_h3_preview as _h3_preview_module
