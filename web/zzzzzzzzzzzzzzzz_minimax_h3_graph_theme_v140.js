@@ -1,7 +1,7 @@
 import { app } from "../../scripts/app.js";
 import { api } from "../../scripts/api.js";
 
-const STYLE_ID = "velvet-vice-h3-graph-theme-v140-polish1";
+const STYLE_ID = "velvet-vice-h3-graph-theme-v141-polish2";
 const H3_MARKERS = new Set([
   "VelvetViceMiniMaxH3SystemHub",
   "VelvetViceMiniMaxH3Director",
@@ -37,9 +37,8 @@ const BASE = Object.freeze({
 });
 
 const RUNTIME = Object.freeze({
-  // Working nodes use the LTX-style Velvet-Vice colour sweep. Runtime
-  // completion deliberately falls back to the role palette instead of
-  // leaving every executed node green.
+  // Working nodes use the Velvet-Vice H3 colour sweep. Runtime completion
+  // deliberately falls back to the role palette instead of freezing green.
   active:  { title: "#654b8c", body: "#132229", box: "#18b796" },
   warning: { title: "#7b6244", body: "#241e17", box: "#d2aa70" },
   error:   { title: "#7b4450", body: "#25181c", box: "#d07b89" },
@@ -57,7 +56,6 @@ let activeAnimationFrame = null;
 let activeAnimationLastPaint = 0;
 const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
 
-
 function hexRgb(hex) {
   const clean = String(hex || "#000000").replace("#", "");
   const full = clean.length === 3 ? clean.split("").map((x) => x + x).join("") : clean.padEnd(6, "0").slice(0, 6);
@@ -74,9 +72,10 @@ function stopActiveAnimation() {
   activeAnimationLastPaint = 0;
 }
 function activePaletteAt(ms, internal = false) {
-  // Slow purple -> blue -> turquoise -> purple, matching the established
-  // LTX motion language without freezing on a green completion colour.
-  const cycle = 5600;
+  // Public H3 language: dark violet -> lilac -> blue -> turquoise ->
+  // poison green -> dark violet. Internal helper nodes remain deliberately
+  // muted so they never compete visually with the user-facing workflow.
+  const cycle = 6200;
   const p = (ms % cycle) / cycle;
   const stops = internal ? [
     [0.00, "#4b535a", "#66717a"],
@@ -84,11 +83,12 @@ function activePaletteAt(ms, internal = false) {
     [0.70, "#536056", "#77866f"],
     [1.00, "#4b535a", "#66717a"],
   ] : [
-    [0.00, "#70449a", "#ae62d4"],
-    [0.34, "#356f9f", "#3b9fd1"],
-    [0.66, "#167d7f", "#15bc96"],
-    [0.82, "#315f99", "#468ed1"],
-    [1.00, "#70449a", "#ae62d4"],
+    [0.00, "#32194f", "#54266f"],
+    [0.20, "#8446b6", "#b45ce2"],
+    [0.40, "#356fa8", "#429edb"],
+    [0.60, "#118f8b", "#18c8b6"],
+    [0.80, "#55a814", "#7dff24"],
+    [1.00, "#32194f", "#54266f"],
   ];
   let left = stops[0], right = stops[stops.length - 1];
   for (let i = 0; i < stops.length - 1; i++) {
@@ -275,6 +275,16 @@ function resetRuntime() {
 
 function markActive(node) {
   if (!node || !h3Active) return;
+
+  // Subgraph execution can emit the same outer H3 Engine node repeatedly for
+  // its internal steps. Re-applying the fixed runtime colour on every event
+  // resets the colour sweep and looks like flicker. Keep the existing active
+  // state untouched when the same node is already running.
+  if (activeNode === node && node.__vvH3GraphRuntime === "active") {
+    startActiveAnimation();
+    return;
+  }
+
   if (activeNode && activeNode !== node && activeNode.__vvH3GraphRuntime === "active") applyNodeState(activeNode, "done");
   activeNode = node;
   applyNodeState(node, "active");
@@ -287,36 +297,38 @@ function installCss() {
   style.id = STYLE_ID;
   style.textContent = `
     .vvh3-themed-shell,.vvh3-themed-preview,.vv-h3-prompt-surface,.vv-h3-final-prompt,.vv-h3-output-studio,.vv-h3-power-lora,.vv-h3-watermark{
-      --h3-a:#ae62d4;--h3-b:#3b9fd1;--h3-fel:#15bc96;--h3-soft:rgba(104,158,199,.34);--h3-glow:rgba(75,139,190,.17);
+      --h3-dark:#32194f;--h3-lilac:#8446b6;--h3-blue:#356fa8;--h3-turq:#118f8b;--h3-poison:#68d91b;
+      --h3-a:#8446b6;--h3-b:#356fa8;--h3-fel:#68d91b;--h3-soft:rgba(104,158,199,.34);--h3-glow:rgba(75,139,190,.17);
       transition:border-color .25s ease,box-shadow .25s ease,background .35s ease;
       animation:vv-h3-fel-working 7.6s ease-in-out infinite;
     }
-    [data-h3-role="prompt"]{--h3-a:#7286b5;--h3-b:#5e9bb0;--h3-soft:rgba(114,145,188,.31);--h3-glow:rgba(89,151,178,.15)}
-    [data-h3-role="video"],[data-h3-role="preview"]{--h3-a:#756ab3;--h3-b:#5790ad;--h3-soft:rgba(116,119,191,.31);--h3-glow:rgba(82,139,180,.17)}
-    [data-h3-role="post"]{--h3-a:#607e9d;--h3-b:#5a9a98;--h3-soft:rgba(91,146,159,.28);--h3-glow:rgba(79,151,147,.14)}
-    [data-h3-role="output"]{--h3-a:#9470ad;--h3-b:#6789a8;--h3-soft:rgba(174,134,199,.31);--h3-glow:rgba(122,109,181,.16)}
-    [data-h3-runtime="active"]{--h3-a:#a75ed0;--h3-b:#3f94ca;--h3-fel:#16bc96;--h3-soft:rgba(76,178,165,.48);--h3-glow:rgba(36,170,159,.25)}
+    [data-h3-role="prompt"]{--h3-a:#8446b6;--h3-b:#356fa8;--h3-soft:rgba(114,145,188,.31);--h3-glow:rgba(89,151,178,.15)}
+    [data-h3-role="video"],[data-h3-role="preview"]{--h3-a:#8446b6;--h3-b:#356fa8;--h3-soft:rgba(116,119,191,.31);--h3-glow:rgba(82,139,180,.17)}
+    [data-h3-role="post"]{--h3-a:#356fa8;--h3-b:#118f8b;--h3-soft:rgba(91,146,159,.28);--h3-glow:rgba(79,151,147,.14)}
+    [data-h3-role="output"]{--h3-a:#8446b6;--h3-b:#356fa8;--h3-soft:rgba(174,134,199,.31);--h3-glow:rgba(122,109,181,.16)}
+    [data-h3-runtime="active"]{--h3-a:#8446b6;--h3-b:#356fa8;--h3-fel:#68d91b;--h3-soft:rgba(76,178,165,.48);--h3-glow:rgba(36,170,159,.25)}
     [data-h3-runtime="warning"]{--h3-a:#b18457;--h3-b:#8c705d;--h3-soft:rgba(213,159,101,.34);--h3-glow:rgba(195,133,75,.18)}
     [data-h3-runtime="error"]{--h3-a:#b65f73;--h3-b:#81586c;--h3-soft:rgba(215,100,122,.38);--h3-glow:rgba(190,77,101,.20)}
 
     @keyframes vv-h3-fel-working{
-      0%,100%{border-color:rgba(174,98,212,.52);box-shadow:0 0 18px rgba(137,72,173,.18)}
-      38%{border-color:rgba(59,159,209,.56);box-shadow:0 0 20px rgba(45,139,188,.18)}
-      68%{border-color:rgba(21,188,150,.62);box-shadow:0 0 22px rgba(17,171,137,.20)}
-      84%{border-color:rgba(70,142,209,.56);box-shadow:0 0 20px rgba(55,119,185,.18)}
+      0%,100%{border-color:rgba(50,25,79,.78);box-shadow:0 0 18px rgba(74,36,105,.20)}
+      20%{border-color:rgba(132,70,182,.68);box-shadow:0 0 20px rgba(132,70,182,.20)}
+      40%{border-color:rgba(53,111,168,.68);box-shadow:0 0 20px rgba(53,111,168,.20)}
+      60%{border-color:rgba(17,143,139,.72);box-shadow:0 0 22px rgba(17,143,139,.21)}
+      80%{border-color:rgba(104,217,27,.78);box-shadow:0 0 24px rgba(104,217,27,.22)}
     }
     .vvh3-themed-shell[data-h3-runtime="active"],.vvh3-themed-preview[data-h3-runtime="active"],.vv-h3-prompt-surface[data-h3-runtime="active"],.vv-h3-output-studio[data-h3-runtime="active"],.vv-h3-power-lora[data-h3-runtime="active"],.vv-h3-final-prompt[data-h3-runtime="active"]{
-      animation:vv-h3-fel-working 3.9s ease-in-out infinite!important;
+      animation:vv-h3-fel-working 4.8s ease-in-out infinite!important;
     }
     .vvh3-themed-shell .vvh3-head,.vvh3-themed-preview .vvh3-preview-head,.vv-h3-prompt-surface .vvh3p-head,.vv-h3-output-studio .vv-head,.vv-h3-power-lora .vv-head,.vv-h3-final-prompt .vv-head{
-      background-image:linear-gradient(100deg,color-mix(in srgb,var(--h3-a) 30%,#171f28),color-mix(in srgb,var(--h3-b) 24%,#171f28),color-mix(in srgb,var(--h3-fel) 18%,#171f28))!important;
-      background-size:180% 100%!important;
-      animation:vv-h3-working-head 7.2s ease-in-out infinite!important;
+      background-image:linear-gradient(100deg,var(--h3-dark),var(--h3-lilac),var(--h3-blue),var(--h3-turq),var(--h3-poison),var(--h3-dark))!important;
+      background-size:320% 100%!important;
+      animation:vv-h3-working-head 8.2s ease-in-out infinite!important;
     }
     .vvh3-themed-shell[data-h3-runtime="active"] .vvh3-head,.vv-h3-prompt-surface[data-h3-runtime="active"] .vvh3p-head,.vv-h3-output-studio[data-h3-runtime="active"] .vv-head,.vv-h3-power-lora[data-h3-runtime="active"] .vv-head,.vv-h3-final-prompt[data-h3-runtime="active"] .vv-head{
-      background-image:linear-gradient(100deg,color-mix(in srgb,var(--h3-a) 30%,#171f28),color-mix(in srgb,var(--h3-b) 24%,#171f28),color-mix(in srgb,var(--h3-fel) 18%,#171f28))!important;
-      background-size:180% 100%!important;
-      animation:vv-h3-working-head 4.6s ease-in-out infinite!important;
+      background-image:linear-gradient(100deg,var(--h3-dark),var(--h3-lilac),var(--h3-blue),var(--h3-turq),var(--h3-poison),var(--h3-dark))!important;
+      background-size:320% 100%!important;
+      animation:vv-h3-working-head 5.2s ease-in-out infinite!important;
     }
     @keyframes vv-h3-working-head{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
 
@@ -342,10 +354,12 @@ function installCss() {
 
     .vv-h3-output-studio,.vv-h3-power-lora,.vv-h3-final-prompt{border-color:var(--h3-soft)!important;box-shadow:0 0 19px var(--h3-glow)!important}
     .vv-h3-output-studio .vv-head,.vv-h3-power-lora .vv-head,.vv-h3-final-prompt .vv-head{
-      background:linear-gradient(115deg,color-mix(in srgb,var(--h3-a) 48%,#222a34),color-mix(in srgb,var(--h3-b) 42%,#222a34))!important;
+      background-image:linear-gradient(100deg,var(--h3-dark),var(--h3-lilac),var(--h3-blue),var(--h3-turq),var(--h3-poison),var(--h3-dark))!important;
+      background-size:320% 100%!important;
       border-bottom-color:var(--h3-soft)!important;
+      animation:vv-h3-working-head 8.2s ease-in-out infinite!important;
     }
-    .vv-h3-output-studio .vv-progress{background:linear-gradient(90deg,var(--h3-a),var(--h3-b))!important}.vv-h3-output-studio[data-h3-runtime="active"] .vv-progress{background:linear-gradient(90deg,var(--h3-a),var(--h3-b),var(--h3-fel))!important;background-size:180% 100%!important;animation:vv-h3-working-head 3.8s ease-in-out infinite!important}
+    .vv-h3-output-studio .vv-progress{background:linear-gradient(90deg,var(--h3-dark),var(--h3-lilac),var(--h3-blue),var(--h3-turq),var(--h3-poison))!important}.vv-h3-output-studio[data-h3-runtime="active"] .vv-progress{background-size:220% 100%!important;animation:vv-h3-working-head 4.6s ease-in-out infinite!important}
     .vv-h3-output-studio .vv-h3-stage.active{border-color:color-mix(in srgb,var(--h3-fel) 38%,var(--h3-soft))!important;box-shadow:0 0 14px var(--h3-glow)!important}
     .vv-h3-power-lora .vv-lora-card.enabled{border-color:var(--h3-soft)!important;box-shadow:0 0 11px var(--h3-glow)!important}
 
@@ -367,10 +381,13 @@ function installCss() {
     }
     .vvh3-unified-modern .vvh3-head,.vvh3-unified-modern .vvh3-preview-head,.vvh3-unified-modern .vvh3p-head,.vvh3-unified-modern .vv-head,.vvh3-unified-modern .vvh3m-head{
       color:#f4f8fb!important;
-      background-image:linear-gradient(105deg,#1e918c,#397ea6,#7160a8,#1e918c)!important;
-      background-size:240% 100%!important;
+      background-image:linear-gradient(105deg,#32194f,#8446b6,#356fa8,#118f8b,#68d91b,#32194f)!important;
+      background-size:320% 100%!important;
       border-bottom:1px solid rgba(92,201,188,.30)!important;
-      animation:vv-h3-working-head 6.2s ease-in-out infinite!important;
+      animation:vv-h3-working-head 7.2s ease-in-out infinite!important;
+    }
+    .vvh3-unified-modern[data-h3-runtime="active"] .vvh3-head,.vvh3-unified-modern[data-h3-runtime="active"] .vvh3-preview-head,.vvh3-unified-modern[data-h3-runtime="active"] .vvh3p-head,.vvh3-unified-modern[data-h3-runtime="active"] .vv-head,.vvh3-unified-modern[data-h3-runtime="active"] .vvh3m-head{
+      animation:vv-h3-working-head 5.2s ease-in-out infinite!important;
     }
     .vvh3-unified-modern .vvh3-section,.vvh3-unified-modern .vvh3p-section,.vvh3-unified-modern .vv-status,.vvh3-unified-modern .vv-module-card,.vvh3-unified-modern .vv-pass-card,.vvh3-unified-modern .vvh3-preview-stage,.vvh3-unified-modern .vv-video-frame,.vvh3-unified-modern .vvh3m-card,.vvh3-unified-modern .vvh3m-status{
       background:linear-gradient(145deg,#111c26,#152330)!important;
@@ -382,13 +399,13 @@ function installCss() {
     }
     .vvh3-unified-modern button,.vvh3-unified-modern .vvh3-segment.active,.vvh3-unified-modern .vv-segment.active{
       border-color:rgba(87,180,195,.40)!important;
-      background-image:linear-gradient(110deg,#6759a7,#397fa8,#188f84)!important;
-      background-size:180% 100%!important;
+      background-image:linear-gradient(110deg,#32194f,#8446b6,#356fa8,#118f8b,#68d91b)!important;
+      background-size:260% 100%!important;
     }
     .vvh3-unified-modern .vvh3-status,.vvh3-unified-modern .vvh3-summary,.vvh3-unified-modern .vv-status-detail,.vvh3-unified-modern .vv-foot{
       background-color:rgba(11,23,31,.72)!important;border-color:rgba(42,169,159,.24)!important;
     }
-    @media (prefers-reduced-motion:reduce){.vvh3-themed-shell,.vvh3-themed-preview,.vv-h3-prompt-surface,.vv-h3-final-prompt,.vv-h3-output-studio,.vv-h3-power-lora,.vv-h3-watermark,.vvh3-themed-shell .vvh3-head,.vvh3-themed-preview .vvh3-preview-head,.vv-h3-prompt-surface .vvh3p-head,.vv-h3-output-studio .vv-head,.vv-h3-power-lora .vv-head,.vv-h3-final-prompt .vv-head{animation:none!important}}
+    @media (prefers-reduced-motion:reduce){.vvh3-themed-shell,.vvh3-themed-preview,.vv-h3-prompt-surface,.vv-h3-final-prompt,.vv-h3-output-studio,.vv-h3-power-lora,.vv-h3-watermark,.vvh3-themed-shell .vvh3-head,.vvh3-themed-preview .vvh3-preview-head,.vv-h3-prompt-surface .vvh3p-head,.vv-h3-output-studio .vv-head,.vv-h3-power-lora .vv-head,.vv-h3-final-prompt .vv-head,.vvh3-unified-modern .vvh3-head,.vvh3-unified-modern .vvh3-preview-head,.vvh3-unified-modern .vvh3p-head,.vvh3-unified-modern .vv-head,.vvh3-unified-modern .vvh3m-head{animation:none!important}}
   `;
   document.head.appendChild(style);
 }
@@ -431,7 +448,7 @@ installCss();
 installListeners();
 
 app.registerExtension({
-  name: "VelvetVice.MiniMaxH3.GraphThemeV140",
+  name: "VelvetVice.MiniMaxH3.GraphThemeV141Polish2",
   nodeCreated(node) {
     setTimeout(() => { if (isH3Graph()) { h3Active = true; applyNodeState(node, "idle"); internalizeH3Watermark(node); applyGroups(); startActiveAnimation(); } }, 0);
   },
