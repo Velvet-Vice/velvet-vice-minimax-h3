@@ -6,9 +6,11 @@ Standalone Velvet Vice custom-node package for **MiniMax H3 FL2VA image-to-video
 
 This repository is MiniMax H3-only. The public node IDs, workflow metadata, UI, guides, HTTP routes and Comfy Registry package use the standalone ID `velvet-vice-minimax-h3`.
 
-The included reference workflow is:
+The included GitHub reference workflow remains:
 
-`workflow_examples/VELVET_VICE_MINIMAX_H3_I2V_v1.4.1.json`
+`workflow_examples/VELVET_VICE_MINIMAX_H3_I2V_v1.4.0.json`
+
+The public/Civitai v1.4.1 workflow should carry `cnr_id = "velvet-vice-minimax-h3"` and `ver = "1.4.1"` on all Velvet Vice H3 nodes so Missing Nodes resolves the current Registry package.
 
 ## Main features
 
@@ -70,11 +72,11 @@ The Velvet Vice custom nodes themselves are distributed by this repository.
 
 ### Comfy Registry / Manager
 
-Once published to the Comfy Registry, install:
+Install:
 
 `velvet-vice-minimax-h3`
 
-Then restart ComfyUI and load the workflow example.
+Then restart ComfyUI and load the workflow.
 
 ### Manual GitHub installation
 
@@ -94,7 +96,6 @@ Restart ComfyUI afterwards.
 Repository target:
 
 https://github.com/Velvet-Vice/velvet-vice-minimax-h3
-
 
 ## Publishing updates
 
