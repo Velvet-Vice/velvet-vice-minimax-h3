@@ -8,19 +8,19 @@ const HEADER_HEIGHT = 44;
 const WIDGET_START_Y = 54;
 const WIDGET_ROW_GAP = 4;
 const PALETTE = Object.freeze({
-    purple: "#6d5f82",
-    purpleSoft: "#8b7a9f",
-    slate: "#536779",
-    slateSoft: "#6f8496",
-    body: "#18212a",
-    bodyRaised: "#202b35",
-    bodyDeep: "#111820",
-    border: "rgba(196,181,214,.38)",
-    borderSoft: "rgba(196,181,214,.15)",
-    text: "#eeeaf2",
-    muted: "#a9b2bc",
-    accent: "#c0afd2",
-    ok: "#79a08f",
+    purple: "#4b2a78",
+    purpleSoft: "#7652a6",
+    slate: "#244d72",
+    slateSoft: "#3a6a94",
+    body: "#0b1722",
+    bodyRaised: "#122334",
+    bodyDeep: "#07111b",
+    border: "rgba(75,111,170,.46)",
+    borderSoft: "rgba(75,111,170,.19)",
+    text: "#eef3fa",
+    muted: "#96a8bd",
+    accent: "#8f6cce",
+    ok: "#62dca4",
     warn: "#c1a36d",
     fail: "#bd7480",
 });
@@ -261,43 +261,35 @@ function drawBody(ctx, node, width, height, titleHeight) {
 
 function drawHeader(ctx, node, width, titleHeight) {
     const state = node.__vvExecutionState ?? "idle";
-    const active = state === "active";
+    const active = state === "active" || state === "active-static";
     const error = state === "error";
-    const phase = (Date.now() % 1600) / 1600;
 
+    // Static Midnight-Violet / Obsidian header. No time-based sweep, pulse,
+    // hue cycling or animation is used anywhere in the canvas chrome.
     const grad = ctx.createLinearGradient(0, 0, width, titleHeight);
-    grad.addColorStop(0, error ? "#a44e63" : String(node.color || "#1e918c"));
-    grad.addColorStop(.58, error ? "#7b4450" : String(node.boxcolor || "#397ea6"));
-    grad.addColorStop(1, error ? "#5d3440" : "#1e918c");
+    grad.addColorStop(0, error ? "#7b3348" : "#4b216f");
+    grad.addColorStop(.48, error ? "#63303e" : "#34245f");
+    grad.addColorStop(1, error ? "#41242d" : "#173d70");
     ctx.fillStyle = grad;
     roundRect(ctx, 1.2, 1.2, width - 2.4, titleHeight, 9);
     ctx.fill();
     ctx.fillRect(1.2, titleHeight - 8, width - 2.4, 8);
 
     const accent = ctx.createLinearGradient(0, 0, width, 0);
-    accent.addColorStop(0, error ? "rgba(212,112,128,.9)" : "rgba(21,188,150,.92)");
-    accent.addColorStop(.56, error ? "rgba(212,112,128,.6)" : "rgba(59,159,209,.86)");
-    accent.addColorStop(1, error ? "rgba(212,112,128,0)" : "rgba(174,98,212,0)");
+    accent.addColorStop(0, error ? "rgba(213,100,121,.92)" : active ? "rgba(35,202,202,.95)" : "rgba(121,82,178,.82)");
+    accent.addColorStop(.55, error ? "rgba(213,100,121,.54)" : active ? "rgba(53,137,210,.88)" : "rgba(65,101,166,.72)");
+    accent.addColorStop(1, "rgba(0,0,0,0)");
     ctx.fillStyle = accent;
     ctx.fillRect(8, titleHeight - 2, Math.max(0, width - 16), 2);
 
-    if (active) {
-        const sweep = ctx.createLinearGradient(-width + phase * width * 2, 0, phase * width * 2, 0);
-        sweep.addColorStop(.35, "rgba(255,255,255,0)");
-        sweep.addColorStop(.5, "rgba(235,226,244,.18)");
-        sweep.addColorStop(.65, "rgba(255,255,255,0)");
-        ctx.fillStyle = sweep;
-        ctx.fillRect(1, 1, width - 2, titleHeight - 2);
-    }
-
-    const dotColor = error ? PALETTE.fail : active ? "#25d5b0" : String(node.boxcolor || "#55a8bd");
-    ctx.fillStyle = "rgba(15,21,28,.68)";
+    const dotColor = error ? PALETTE.fail : active ? "#28cfc6" : "#7652a6";
+    ctx.fillStyle = "rgba(7,14,23,.82)";
     ctx.beginPath();
     ctx.arc(15, titleHeight / 2, 5.5, 0, Math.PI * 2);
     ctx.fill();
     ctx.fillStyle = dotColor;
     ctx.beginPath();
-    ctx.arc(15, titleHeight / 2, active ? 3.2 + Math.sin(phase * Math.PI * 2) * .55 : 3, 0, Math.PI * 2);
+    ctx.arc(15, titleHeight / 2, 3.1, 0, Math.PI * 2);
     ctx.fill();
 
     const title = String(node.__vvDisplayTitle ?? node.title ?? nodeType(node) ?? "VELVET VICE");
@@ -359,23 +351,20 @@ function applyTheme(node) {
         const state = this.__vvExecutionState ?? "idle";
         ctx.lineWidth = state === "active" ? 2.1 : 1.1;
         ctx.strokeStyle = state === "error" ? "rgba(210,113,128,.75)" : String(this.boxcolor || "#3b9fd1");
-        if (state === "active") {
-            ctx.shadowColor = String(this.boxcolor || "#15bc96");
-            ctx.shadowBlur = 12;
-        }
         roundRect(ctx, .8, .8, width - 1.6, height - 1.6, 9);
         ctx.stroke();
 
-        if (!chromeExcluded(this)) {
-            ctx.fillStyle = state === "active" ? "rgba(21,188,150,.72)" : "rgba(59,159,209,.38)";
-            roundRect(ctx, 4.5, titleHeight + 7, 3, Math.max(10, height - titleHeight - 14), 2);
-            ctx.fill();
+        if (!noteLike(this)) {
+            ctx.font = "800 7px Inter, Segoe UI, Arial";
+            ctx.textAlign = "right";
+            ctx.textBaseline = "middle";
+            ctx.fillStyle = "rgba(221,227,234,.61)";
+            ctx.fillText(badgeFor(this), width - 12, titleHeight / 2 + .5);
         }
         ctx.restore();
     };
+
     reserveNativeWidgetLane(node);
-    setTimeout(() => reserveNativeWidgetLane(node), 0);
-    setTimeout(() => reserveNativeWidgetLane(node), 250);
     node.setDirtyCanvas?.(true, true);
 }
 
@@ -394,15 +383,16 @@ function setState(node, state) {
     app.graph?.setDirtyCanvas?.(true, true);
 }
 
-function resetStates(state = "idle") {
-    for (const node of themedNodes) setState(node, state);
+function activateNode(id) {
+    const node = resolveNode(id);
+    if (!node || !marked(node)) return;
+    if (activeNode && activeNode !== node && activeNode.__vvExecutionState === "active") setState(activeNode, "done");
+    activeNode = node;
+    setState(node, "active");
 }
 
-function activateNode(id) {
-    const next = resolveNode(id);
-    if (activeNode && activeNode !== next && activeNode.__vvExecutionState === "active") setState(activeNode, "done");
-    activeNode = next;
-    if (next) setState(next, "active");
+function resetStates(state = "idle") {
+    for (const node of themedNodes) setState(node, state);
 }
 
 function installExecutionStyling() {
@@ -444,12 +434,9 @@ function installExecutionStyling() {
             }
         }, 2600);
     });
-    animationTimer = setInterval(() => {
-        if (activeNode?.__vvExecutionState === "active") {
-            activeNode.setDirtyCanvas?.(true, true);
-            app.graph?.setDirtyCanvas?.(true, false);
-        }
-    }, 90);
+    // Static design: no repaint timer. Execution events repaint only when the
+    // state actually changes, which keeps dragging/resizing responsive.
+    animationTimer = null;
 }
 
 function themeGroups() {
