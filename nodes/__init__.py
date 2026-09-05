@@ -39,6 +39,11 @@ from .minimax_h3_public import (
     VelvetViceMiniMaxH3TemporalAntiGhost,
 )
 
+from .quality_refine import (
+    VelvetViceMiniMaxH3AVRefineMerge,
+    VelvetViceMiniMaxH3LatentRefineSwitch,
+)
+
 import logging as _logging
 from . import minimax_h3_preview as _h3_preview_module
 from ..services.taeh3_auto import ensure_taeh3_decoder as _ensure_taeh3_decoder

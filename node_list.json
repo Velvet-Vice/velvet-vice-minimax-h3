@@ -1,5 +1,5 @@
 {
-  "VelvetViceMiniMaxH3SystemHub": "Central MiniMax H3 backend, model, VAE and Turbo-LoRA configuration hub.",
+  "VelvetViceMiniMaxH3SystemHub": "Central MiniMax H3 backend, model, VAE, Turbo-LoRA and optional Quality Refine configuration hub.",
   "VelvetViceMiniMaxH3Director": "Primary MiniMax H3 render control for duration, resolution, seed, Turbo and native audio.",
   "VelvetViceMiniMaxH3ProfileManager": "Persistent MiniMax H3 and LoRA profiles.",
   "VelvetViceMiniMaxH3PromptDirector": "Vision-assisted MiniMax H3 prompt director.",
@@ -26,7 +26,9 @@
   "VelvetViceMiniMaxH3OptionalTurboLora": "Optional standalone H3 Turbo LoRA loader.",
   "VelvetViceMiniMaxH3ResolutionPlanner": "MiniMax H3 resolution planner.",
   "VelvetViceMiniMaxH3LivePreviewBridge": "Compatibility bridge for H3 live preview.",
-  "VelvetViceMiniMaxH3LivePreviewDisplay": "Compatibility display for H3 live preview."
-  ,"VelvetViceMiniMaxH3Preflight": "Read-only H3 backend, model, encoder and VAE preflight monitor."
-  ,"VelvetViceMiniMaxH3RenderTimer": "Current-node, H3-core, total and last-render runtime monitor."
+  "VelvetViceMiniMaxH3LivePreviewDisplay": "Compatibility display for H3 live preview.",
+  "VelvetViceMiniMaxH3Preflight": "Read-only H3 backend, model, encoder and VAE preflight monitor.",
+  "VelvetViceMiniMaxH3RenderTimer": "Current-node, H3-core, total and last-render runtime monitor.",
+  "VelvetViceMiniMaxH3AVRefineMerge": "Internal MiniMax H3 Quality Refine helper that can preserve pass-1 audio.",
+  "VelvetViceMiniMaxH3LatentRefineSwitch": "Lazy Quality Refine selector; OFF prevents second-sampler execution."
 }

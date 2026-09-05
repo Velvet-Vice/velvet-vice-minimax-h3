@@ -29,6 +29,8 @@ from .nodes import (
     VelvetViceMiniMaxH3ImageMemoryCheckpoint,
     VelvetViceMiniMaxH3GhostAnalyzer,
     VelvetViceMiniMaxH3TemporalAntiGhost,
+    VelvetViceMiniMaxH3AVRefineMerge,
+    VelvetViceMiniMaxH3LatentRefineSwitch,
 )
 from .services.interrupt_cleanup import install_interruption_cleanup_hook
 
@@ -68,6 +70,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "VelvetViceMiniMaxH3ImageMemoryCheckpoint": "VELVET VICE MiniMax H3 — Image Memory Checkpoint",
     "VelvetViceMiniMaxH3GhostAnalyzer": "VELVET VICE MiniMax H3 — Ghost Analyzer",
     "VelvetViceMiniMaxH3TemporalAntiGhost": "VELVET VICE MiniMax H3 — Temporal Anti-Ghost",
+    "VelvetViceMiniMaxH3AVRefineMerge": "VELVET VICE MiniMax H3 — Quality Refine AV Merge",
+    "VelvetViceMiniMaxH3LatentRefineSwitch": "VELVET VICE MiniMax H3 — Quality Refine Lazy Switch",
 }
 
 WEB_DIRECTORY = "./web"

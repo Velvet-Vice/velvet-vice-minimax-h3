@@ -1,5 +1,30 @@
 # Changelog
 
+## 1.4.5 — 2026-09-05
+
+Quality Refine, persistence and static UI release.
+
+### Added
+
+- Optional **Quality Refine / Second Sampler** integrated directly into the H3 System Hub.
+- True lazy bypass: with Quality Refine OFF, pass 2 is not requested or executed.
+- User-controlled Refine Steps in LIGHT, HIGH and CUSTOM modes.
+- LIGHT denoise preset `0.12`, HIGH `0.20`, CUSTOM `0.01–0.35`.
+- Optional **Preserve Base Audio** to retain pass-1 audio while pass 2 refines the video latent.
+- Internal H3 AV refine merge and latent refine switch nodes.
+
+### Fixed
+
+- H3 Vision / Prompt Director mode now persists across workflow switches instead of resetting to MANUAL.
+- Static Midnight Violet / Obsidian styling is reasserted during execution so node bars no longer drift to green/teal or other dynamic colors.
+- H3 System Hub now keeps Quality Refine controls in the same integrated control surface instead of a loose test panel.
+
+### Registry metadata
+
+- Publisher: `velvet-vice`
+- Node ID: `velvet-vice-minimax-h3`
+- Version: `1.4.5`
+
 ## 1.4.4
 
 - Registry synchronization release built from the restored canonical Civitai 1.4.3 master.
