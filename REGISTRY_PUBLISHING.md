@@ -30,12 +30,12 @@ Before publishing a new version, update all version-bearing locations that are i
 
 - `pyproject.toml`
 - `version.py`
-- workflow custom-node metadata (`properties.cnr_id` and `properties.ver`)
+- workflow custom-node metadata (`properties.cnr_id` and `properties.ver`) for the public/Civitai workflow
 - reference workflow filename when the public workflow version changes
-- JavaScript package/version constants that are release-specific
+- JavaScript package/version constants when they are release-specific
 - README / changelog / release notes
 
-The custom-node workflow metadata for v1.4.1 is normalized to:
+For the public/Civitai v1.4.1 workflow, use:
 
 - `cnr_id = "velvet-vice-minimax-h3"`
 - `ver = "1.4.1"`
