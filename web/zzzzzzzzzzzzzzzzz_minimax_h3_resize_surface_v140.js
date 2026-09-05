@@ -67,8 +67,6 @@ function finite(value, fallback = 0) {
 
 function normalizeLayout(node, widget, element, spec) {
   if (!widget || !element || typeof widget.computeLayoutSize !== "function") {
-    // Legacy frontend: keep whatever computeSize() implementation the panel
-    // already supplied. The bug addressed here is specific to modern layout.
     return false;
   }
 
@@ -89,17 +87,11 @@ function normalizeLayout(node, widget, element, spec) {
     widget[RECORD_KEY] = record;
   }
 
-  // A few H3 panels (notably Output Studio and Live Preview) may replace their
-  // layout callback later when media geometry changes. Capture that new native
-  // callback and wrap it again instead of fighting it.
   if (widget.computeLayoutSize !== record.wrapper) {
     record.baseLayout = widget.computeLayoutSize.bind(widget);
     widget.computeLayoutSize = record.wrapper;
   }
 
-  // Critical: in current LiteGraph, the mere presence of computeSize() puts
-  // the widget in the fixed-height branch before computeLayoutSize is checked.
-  // Remove only that legacy callback. The DOMWidget's growable layout remains.
   if (widget.computeSize) widget.computeSize = undefined;
 
   widget.options ??= {};
@@ -122,9 +114,6 @@ function normalizeLayout(node, widget, element, spec) {
   element.style.setProperty("max-height", "none", "important");
 
   if (spec.intrinsicShell) {
-    // Output Studio measures shell.scrollHeight to size the final video player.
-    // Do not force shell height; ComfyUI still resizes the DOM widget host via
-    // computedHeight, while the Studio keeps its intrinsic media measurement.
     element.style.removeProperty("height");
     element.style.removeProperty("min-height");
   } else {
@@ -157,9 +146,6 @@ function bindNode(node) {
         try { result = previousResize.apply(this, arguments); }
         catch (error) { console.warn("[VELVET VICE] H3 native onResize failed", error); }
       }
-
-      // Existing panel handlers may have restored a legacy computeSize during
-      // their own geometry update. Normalize after them, without touching size.
       const currentWidget = widgetFor(this, spec.prefix) ?? widget;
       const currentElement = elementFor(this, currentWidget) ?? element;
       normalizeLayout(this, currentWidget, currentElement, spec);
