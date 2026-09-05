@@ -1,7 +1,11 @@
 import { app } from "../../scripts/app.js";
 import { api } from "../../scripts/api.js";
 
-const STYLE_ID = "velvet-vice-h3-graph-theme-v141-active-only";
+// MiniMax H3 visual runtime aligned with the proven Velvet Vice KREA model:
+// one execution-state owner, static idle nodes, and a color sweep only on the
+// node that is actually active. This file never changes execution state.
+
+const STYLE_ID = "velvet-vice-h3-krea-style-runtime-v142-test";
 const H3_MARKERS = new Set([
   "VelvetViceMiniMaxH3SystemHub",
   "VelvetViceMiniMaxH3Director",
@@ -10,19 +14,6 @@ const H3_MARKERS = new Set([
   "VelvetViceMiniMaxH3Preflight",
   "VelvetViceMiniMaxH3RenderTimer",
 ]);
-
-const RUNAWAY_HEIGHT_RECOVERY = Object.freeze({
-  VelvetViceMiniMaxH3SystemHub: 850,
-  VelvetViceMiniMaxH3Director: 690,
-  VelvetViceMiniMaxH3PromptDirector: 780,
-  VelvetViceMiniMaxH3OutputHub: 700,
-  VelvetViceMiniMaxH3ProfileManager: 450,
-  VelvetViceMiniMaxH3LivePreview: 620,
-  VelvetViceMiniMaxH3PowerLoraAV: 650,
-  VelvetViceMiniMaxH3OutputStudio: 700,
-  VelvetViceMiniMaxH3Preflight: 405,
-  VelvetViceMiniMaxH3RenderTimer: 285,
-});
 
 const BASE = Object.freeze({
   setup:    { title: "#605276", body: "#10212b", box: "#9b86b1" },
@@ -37,15 +28,22 @@ const BASE = Object.freeze({
   internal: { title: "#39434d", body: "#0d171f", box: "#555f69" },
 });
 
-const RUNTIME = Object.freeze({
-  warning: { title: "#7b6244", body: "#241e17", box: "#d2aa70" },
-  error:   { title: "#7b4450", body: "#25181c", box: "#d07b89" },
-});
+const ACTIVE_STOPS = Object.freeze([
+  [0.00, "#32194f", "#54266f"], // dark violet
+  [0.20, "#8446b6", "#b45ce2"], // lilac
+  [0.40, "#356fa8", "#429edb"], // blue
+  [0.60, "#118f8b", "#18c8b6"], // turquoise
+  [0.80, "#55a814", "#7dff24"], // poison green
+  [1.00, "#32194f", "#54266f"],
+]);
 
-let activeNode = null;
-let h3Active = false;
-let activeAnimationFrame = null;
-let activeAnimationLastPaint = 0;
+const ERROR = Object.freeze({ title: "#7b4450", body: "#25181c", box: "#d07b89" });
+const WARNING = Object.freeze({ title: "#7b6244", body: "#241e17", box: "#d2aa70" });
+
+let visualActiveNode = null;
+let animationFrame = null;
+let lastPaint = 0;
+let listenersInstalled = false;
 const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
 
 function nodeType(node) { return String(node?.comfyClass ?? node?.type ?? ""); }
@@ -66,12 +64,6 @@ function isH3Graph() {
   );
 }
 
-function topNodeId(detail) {
-  const raw = detail == null ? "" : typeof detail === "object" ? String(detail.node ?? "") : String(detail);
-  const top = raw.split(":")[0];
-  return Number.isFinite(Number(top)) ? Number(top) : null;
-}
-
 function roleFor(node) {
   const type = nodeType(node);
   const title = titleOf(node).toUpperCase();
@@ -87,6 +79,8 @@ function roleFor(node) {
   return "setup";
 }
 
+function baseFor(node) { return BASE[roleFor(node)] ?? BASE.setup; }
+
 function shellFor(node) {
   return node?.__vvh3Shell
     ?? node?.__vvH3PromptShell
@@ -95,28 +89,20 @@ function shellFor(node) {
     ?? node?.__vvOutputShell
     ?? node?.__vvWatermarkShell
     ?? node?.__vvH3MonitorShell
+    ?? node?.__vvh3PreviewDisplay?.shell
     ?? null;
 }
 
-function baseFor(node) { return BASE[roleFor(node)] ?? BASE.setup; }
+function stateFor(node) {
+  return String(node?.__vvExecutionState ?? "idle").toLowerCase();
+}
 
-function setShellState(node, state, role) {
+function setShellState(node, state = stateFor(node)) {
   const shell = shellFor(node);
   if (!shell) return;
   shell.classList.add("vvh3-unified-modern");
   shell.dataset.h3Runtime = state;
-  shell.dataset.h3Role = role;
-  if (nodeType(node) === "VelvetViceMiniMaxH3WatermarkOverlay") shell.classList.add("vv-h3-watermark");
-}
-
-function recoverRunawayHeight(node) {
-  const normalHeight = RUNAWAY_HEIGHT_RECOVERY[nodeType(node)];
-  const currentHeight = Number(node?.size?.[1] ?? 0);
-  if (!normalHeight || currentHeight < 2200 || node.__vvH3RunawayHeightRecovered) return;
-  node.__vvH3RunawayHeightRecovered = true;
-  const width = Math.max(320, Number(node?.size?.[0] ?? 0));
-  node.setSize?.([width, normalHeight]);
-  console.warn(`[VELVET VICE] Recovered runaway H3 node height: ${nodeType(node)} ${currentHeight}px -> ${normalHeight}px`);
+  shell.dataset.h3Role = roleFor(node);
 }
 
 function hexRgb(hex) {
@@ -131,110 +117,93 @@ function mixHex(a, b, t) {
   return `#${out.map((v) => v.toString(16).padStart(2, "0")).join("")}`;
 }
 
-function activePaletteAt(ms, internal = false) {
-  const cycle = 6200;
-  const p = (ms % cycle) / cycle;
-  const stops = internal ? [
-    [0.00, "#4b535a", "#66717a"],
-    [0.44, "#475863", "#627985"],
-    [0.70, "#536056", "#77866f"],
-    [1.00, "#4b535a", "#66717a"],
-  ] : [
-    [0.00, "#32194f", "#54266f"],
-    [0.20, "#8446b6", "#b45ce2"],
-    [0.40, "#356fa8", "#429edb"],
-    [0.60, "#118f8b", "#18c8b6"],
-    [0.80, "#55a814", "#7dff24"],
-    [1.00, "#32194f", "#54266f"],
-  ];
-  let left = stops[0], right = stops[stops.length - 1];
-  for (let i = 0; i < stops.length - 1; i += 1) {
-    if (p >= stops[i][0] && p <= stops[i + 1][0]) {
-      left = stops[i]; right = stops[i + 1]; break;
+function activePaletteAt(ms) {
+  const p = (ms % 5200) / 5200;
+  let left = ACTIVE_STOPS[0];
+  let right = ACTIVE_STOPS[ACTIVE_STOPS.length - 1];
+  for (let i = 0; i < ACTIVE_STOPS.length - 1; i += 1) {
+    if (p >= ACTIVE_STOPS[i][0] && p <= ACTIVE_STOPS[i + 1][0]) {
+      left = ACTIVE_STOPS[i]; right = ACTIVE_STOPS[i + 1]; break;
     }
   }
   const local = (p - left[0]) / Math.max(0.0001, right[0] - left[0]);
   return { title: mixHex(left[1], right[1], local), box: mixHex(left[2], right[2], local) };
 }
 
-function stopActiveAnimation() {
-  if (activeAnimationFrame != null) cancelAnimationFrame(activeAnimationFrame);
-  activeAnimationFrame = null;
-  activeAnimationLastPaint = 0;
-}
-
-function startActiveAnimation() {
-  if (activeAnimationFrame != null || !h3Active || reducedMotion || !activeNode) return;
-  const tick = (now) => {
-    if (!h3Active || !isH3Graph() || !activeNode || activeNode.__vvH3GraphRuntime !== "active") {
-      stopActiveAnimation();
-      return;
-    }
-
-    if (!activeAnimationLastPaint || now - activeAnimationLastPaint >= 100) {
-      activeAnimationLastPaint = now;
-      const item = activeNode;
-      const role = roleFor(item);
-      const base = baseFor(item);
-      const pal = activePaletteAt(now * 1.08, role === "internal");
-      item.color = mixHex(base.title, pal.title, 0.94);
-      item.bgcolor = mixHex(base.body, pal.title, 0.12);
-      item.boxcolor = mixHex(base.box, pal.box, 0.96);
-      app.graph?.setDirtyCanvas?.(true, false);
-    }
-    activeAnimationFrame = requestAnimationFrame(tick);
-  };
-  activeAnimationFrame = requestAnimationFrame(tick);
-}
-
-function applyNodeState(node, state = "idle") {
-  if (!node || !h3Active || isZenNode(node)) return;
-  recoverRunawayHeight(node);
-  const effectiveState = state === "done" ? "idle" : state;
-  const role = roleFor(node);
+function restoreStatic(node, state = stateFor(node)) {
+  if (!node || isZenNode(node)) return;
   const base = baseFor(node);
-  const runtime = RUNTIME[effectiveState] ?? null;
-
-  node.__vvSuppressCanvasChromeV1115 = Boolean(shellFor(node));
-  if (node?.flags?.allow_interaction !== false) node.resizable = true;
-  node.title_text_color = "#e9edf3";
-  try {
-    if (globalThis.LiteGraph?.ROUND_SHAPE != null) node.shape = globalThis.LiteGraph.ROUND_SHAPE;
-  } catch (_) {}
-
-  node.color = runtime?.title ?? base.title;
-  node.bgcolor = runtime?.body ?? base.body;
-  node.boxcolor = runtime?.box ?? base.box;
-  node.__vvH3GraphRuntime = effectiveState;
-  setShellState(node, effectiveState, role);
+  const special = state === "error" ? ERROR : state === "warning" ? WARNING : null;
+  node.color = special?.title ?? base.title;
+  node.bgcolor = special?.body ?? base.body;
+  node.boxcolor = special?.box ?? base.box;
+  setShellState(node, state);
   node.setDirtyCanvas?.(true, true);
 }
 
-function finishActiveNode(state = "done") {
-  if (!activeNode) return;
-  const node = activeNode;
-  activeNode = null;
-  stopActiveAnimation();
-  applyNodeState(node, state);
+function stopAnimation() {
+  if (animationFrame != null) cancelAnimationFrame(animationFrame);
+  animationFrame = null;
+  lastPaint = 0;
 }
 
-function markActive(node) {
-  if (!node || !h3Active || isZenNode(node)) return;
+function runActiveAnimation() {
+  if (animationFrame != null || reducedMotion || !visualActiveNode) return;
+  const tick = (now) => {
+    const node = visualActiveNode;
+    if (!node || !isH3Graph() || stateFor(node) !== "active") {
+      if (node) restoreStatic(node, stateFor(node));
+      visualActiveNode = null;
+      stopAnimation();
+      return;
+    }
 
-  // Subgraph execution can report the same outer H3 engine many times. Never
-  // restart the palette when that exact node is already active.
-  if (activeNode === node && node.__vvH3GraphRuntime === "active") return;
-
-  if (activeNode && activeNode !== node) finishActiveNode("done");
-  activeNode = node;
-  applyNodeState(node, "active");
-  startActiveAnimation();
+    // KREA principle: repaint only the active node. The body remains static;
+    // node.color / boxcolor feed only the H3 canvas header and active border.
+    if (!lastPaint || now - lastPaint >= 80) {
+      lastPaint = now;
+      const pal = activePaletteAt(now);
+      node.color = pal.title;
+      node.boxcolor = pal.box;
+      node.bgcolor = baseFor(node).body;
+      setShellState(node, "active");
+      node.setDirtyCanvas?.(true, true);
+      app.graph?.setDirtyCanvas?.(true, false);
+    }
+    animationFrame = requestAnimationFrame(tick);
+  };
+  animationFrame = requestAnimationFrame(tick);
 }
 
-function internalizeH3Watermark(node = null) {
-  if (!h3Active) return;
-  const wm = node ?? currentGraphNodes().find((item) => nodeType(item) === "VelvetViceMiniMaxH3WatermarkOverlay");
-  if (!wm || nodeType(wm) !== "VelvetViceMiniMaxH3WatermarkOverlay") return;
+function syncRuntime() {
+  if (!isH3Graph()) {
+    if (visualActiveNode) restoreStatic(visualActiveNode, stateFor(visualActiveNode));
+    visualActiveNode = null;
+    stopAnimation();
+    return;
+  }
+
+  let nextActive = null;
+  for (const node of currentGraphNodes()) {
+    if (isZenNode(node)) continue;
+    const state = stateFor(node);
+    setShellState(node, state);
+    if (state === "active" && !nextActive) nextActive = node;
+    else if (node !== visualActiveNode) restoreStatic(node, state);
+  }
+
+  if (visualActiveNode && visualActiveNode !== nextActive) {
+    restoreStatic(visualActiveNode, stateFor(visualActiveNode));
+  }
+
+  visualActiveNode = nextActive;
+  if (visualActiveNode) runActiveAnimation();
+  else stopAnimation();
+}
+
+function internalizeH3Watermark() {
+  const wm = currentGraphNodes().find((item) => nodeType(item) === "VelvetViceMiniMaxH3WatermarkOverlay");
+  if (!wm) return;
   wm.title = "H3 INTERNAL · WATERMARK APPLY";
   wm.flags ??= {};
   wm.flags.collapsed = true;
@@ -253,7 +222,7 @@ function internalizeH3Watermark(node = null) {
 }
 
 function applyGroups() {
-  if (!h3Active) return;
+  if (!isH3Graph()) return;
   const colors = {
     "00": "#2b2734", "01": "#23303a", "02": "#30283a", "03": "#26333e",
     "04": "#2d2835", "05": "#29332e", "06": "#2b2d35", "07": "#222a32", "08": "#263136",
@@ -265,163 +234,139 @@ function applyGroups() {
   }
 }
 
-function applyAll() {
-  h3Active = isH3Graph();
-  if (!h3Active) {
-    stopActiveAnimation();
-    return;
-  }
-  for (const node of currentGraphNodes()) {
-    if (!isZenNode(node)) applyNodeState(node, node === activeNode ? "active" : "idle");
-  }
-  internalizeH3Watermark();
-  applyGroups();
-  app.graph?.setDirtyCanvas?.(true, true);
-  if (activeNode) startActiveAnimation();
-}
-
-function resetRuntime() {
-  stopActiveAnimation();
-  activeNode = null;
-  for (const node of currentGraphNodes()) applyNodeState(node, "idle");
-  applyGroups();
-}
-
 function installCss() {
   if (document.getElementById(STYLE_ID)) return;
   const style = document.createElement("style");
   style.id = STYLE_ID;
   style.textContent = `
-    .vvh3-themed-shell,.vvh3-themed-preview,.vv-h3-prompt-surface,.vv-h3-final-prompt,.vv-h3-output-studio,.vv-h3-power-lora,.vv-h3-watermark{
+    .vvh3-themed-shell,.vvh3-themed-preview,.vv-h3-prompt-surface,.vv-h3-final-prompt,.vv-h3-output-studio,.vv-h3-power-lora,.vv-h3-watermark,.vvh3-monitor{
       --h3-dark:#32194f;--h3-lilac:#8446b6;--h3-blue:#356fa8;--h3-turq:#118f8b;--h3-poison:#68d91b;
-      --h3-a:#8446b6;--h3-b:#356fa8;--h3-fel:#68d91b;--h3-soft:rgba(104,158,199,.34);--h3-glow:rgba(75,139,190,.17);
-      transition:border-color .20s ease,box-shadow .20s ease,background .20s ease;
+      --h3-a:#605276;--h3-b:#526a82;--h3-soft:rgba(104,158,199,.28);--h3-glow:rgba(75,139,190,.13);
+      animation:none!important;
+      transition:border-color .16s ease,box-shadow .16s ease;
+    }
+    [data-h3-role="prompt"]{--h3-a:#5b718a;--h3-b:#7fa0bd}
+    [data-h3-role="model"]{--h3-a:#69557d;--h3-b:#a087b2}
+    [data-h3-role="video"]{--h3-a:#4f6b88;--h3-b:#7894c7}
+    [data-h3-role="preview"]{--h3-a:#587a94;--h3-b:#78a9c0}
+    [data-h3-role="post"]{--h3-a:#50727a;--h3-b:#79a9aa}
+    [data-h3-role="output"]{--h3-a:#6d587f;--h3-b:#aa8abc}
+    [data-h3-role="guide"]{--h3-a:#444d58;--h3-b:#6c7782}
+    [data-h3-role="internal"]{--h3-a:#39434d;--h3-b:#555f69}
+
+    /* Idle = KREA principle: strong but completely static header. */
+    .vvh3-themed-shell .vvh3-head,
+    .vvh3-themed-preview .vvh3-preview-head,
+    .vv-h3-prompt-surface .vvh3p-head,
+    .vv-h3-output-studio .vv-head,
+    .vv-h3-power-lora .vv-head,
+    .vv-h3-final-prompt .vv-head,
+    .vvh3-monitor .vvh3m-head,
+    .vvh3-unified-modern .vvh3-head,
+    .vvh3-unified-modern .vvh3-preview-head,
+    .vvh3-unified-modern .vvh3p-head,
+    .vvh3-unified-modern .vv-head,
+    .vvh3-unified-modern .vvh3m-head{
+      background:linear-gradient(112deg,var(--h3-a),var(--h3-b),#121c25)!important;
+      background-size:100% 100%!important;
+      background-position:0 50%!important;
       animation:none!important;
     }
-    [data-h3-role="prompt"]{--h3-a:#8446b6;--h3-b:#356fa8;--h3-soft:rgba(114,145,188,.31);--h3-glow:rgba(89,151,178,.15)}
-    [data-h3-role="video"],[data-h3-role="preview"]{--h3-a:#8446b6;--h3-b:#356fa8;--h3-soft:rgba(116,119,191,.31);--h3-glow:rgba(82,139,180,.17)}
-    [data-h3-role="post"]{--h3-a:#356fa8;--h3-b:#118f8b;--h3-soft:rgba(91,146,159,.28);--h3-glow:rgba(79,151,147,.14)}
-    [data-h3-role="output"]{--h3-a:#8446b6;--h3-b:#356fa8;--h3-soft:rgba(174,134,199,.31);--h3-glow:rgba(122,109,181,.16)}
-    [data-h3-runtime="warning"]{--h3-a:#b18457;--h3-b:#8c705d;--h3-soft:rgba(213,159,101,.34);--h3-glow:rgba(195,133,75,.18)}
-    [data-h3-runtime="error"]{--h3-a:#b65f73;--h3-b:#81586c;--h3-soft:rgba(215,100,122,.38);--h3-glow:rgba(190,77,101,.20)}
 
-    @keyframes vv-h3-active-frame{
-      0%,100%{border-color:rgba(50,25,79,.78);box-shadow:0 0 18px rgba(74,36,105,.20)}
-      20%{border-color:rgba(132,70,182,.70);box-shadow:0 0 20px rgba(132,70,182,.20)}
-      40%{border-color:rgba(53,111,168,.70);box-shadow:0 0 20px rgba(53,111,168,.20)}
-      60%{border-color:rgba(17,143,139,.74);box-shadow:0 0 22px rgba(17,143,139,.21)}
-      80%{border-color:rgba(104,217,27,.80);box-shadow:0 0 24px rgba(104,217,27,.22)}
+    /* Active = only this header receives the Velvet Vice sweep. */
+    @keyframes vv-h3-krea-sweep{0%{background-position:0% 50%}100%{background-position:250% 50%}}
+    [data-h3-runtime="active"] .vvh3-head,
+    [data-h3-runtime="active"] .vvh3-preview-head,
+    [data-h3-runtime="active"] .vvh3p-head,
+    [data-h3-runtime="active"] .vv-head,
+    [data-h3-runtime="active"] .vvh3m-head{
+      background-image:linear-gradient(90deg,#32194f,#8446b6,#356fa8,#118f8b,#68d91b,#32194f,#8446b6,#356fa8,#118f8b,#68d91b,#32194f)!important;
+      background-size:250% 100%!important;
+      animation:vv-h3-krea-sweep 4.6s linear infinite!important;
     }
-    @keyframes vv-h3-active-head{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
 
+    /* No permanent monitor/director/button animations while idle. */
+    .vvh3-monitor,.vvh3m-head,.vvh3m-button,
+    .vvh3-director-shell,.vvh3-director-shell .vvh3-head::after,
+    .vv-h3-output-studio,.vv-h3-power-lora,.vv-h3-final-prompt{
+      animation:none!important;
+    }
+    [data-h3-runtime="active"].vvh3-unified-modern,
     [data-h3-runtime="active"].vvh3-themed-shell,
     [data-h3-runtime="active"].vvh3-themed-preview,
-    [data-h3-runtime="active"].vv-h3-prompt-surface,
-    [data-h3-runtime="active"].vv-h3-final-prompt,
     [data-h3-runtime="active"].vv-h3-output-studio,
-    [data-h3-runtime="active"].vv-h3-power-lora{
-      animation:vv-h3-active-frame 4.8s ease-in-out infinite!important;
+    [data-h3-runtime="active"].vv-h3-power-lora,
+    [data-h3-runtime="active"].vv-h3-prompt-surface,
+    [data-h3-runtime="active"].vvh3-monitor{
+      border-color:rgba(24,200,182,.62)!important;
+      box-shadow:0 0 0 1px rgba(132,70,182,.16),0 0 18px rgba(24,200,182,.18),0 10px 26px rgba(0,0,0,.30)!important;
     }
-
-    .vvh3-themed-shell .vvh3-head,.vvh3-themed-preview .vvh3-preview-head,.vv-h3-prompt-surface .vvh3p-head,.vv-h3-output-studio .vv-head,.vv-h3-power-lora .vv-head,.vv-h3-final-prompt .vv-head,
-    .vvh3-unified-modern .vvh3-head,.vvh3-unified-modern .vvh3-preview-head,.vvh3-unified-modern .vvh3p-head,.vvh3-unified-modern .vv-head,.vvh3-unified-modern .vvh3m-head{
-      background-image:linear-gradient(105deg,var(--h3-a),var(--h3-b))!important;
-      background-size:100% 100%!important;
-      background-position:50% 50%!important;
-      animation:none!important;
-    }
-
-    [data-h3-runtime="active"] .vvh3-head,[data-h3-runtime="active"] .vvh3-preview-head,[data-h3-runtime="active"] .vvh3p-head,[data-h3-runtime="active"] .vv-head,[data-h3-runtime="active"] .vvh3m-head{
-      background-image:linear-gradient(105deg,#32194f,#8446b6,#356fa8,#118f8b,#68d91b,#32194f)!important;
-      background-size:320% 100%!important;
-      animation:vv-h3-active-head 5.2s ease-in-out infinite!important;
-    }
-
-    .vvh3-themed-shell{border:1px solid var(--h3-soft)!important;box-shadow:0 0 18px var(--h3-glow)}
-    .vvh3-themed-shell .vvh3-head{border-bottom:1px solid var(--h3-soft)!important;position:relative}
-    .vvh3-themed-shell .vvh3-title,.vvh3-themed-shell .vvh3-section-title{color:color-mix(in srgb,var(--h3-a) 60%,#dce6ee)!important}
-    .vvh3-themed-shell .vvh3-section{border-color:color-mix(in srgb,var(--h3-soft) 70%,transparent)!important}
-    .vvh3-themed-preview{border:1px solid var(--h3-soft)!important;background:linear-gradient(145deg,#111b25,#172531)!important;box-shadow:0 0 20px var(--h3-glow)!important}
-    .vv-h3-prompt-surface,.vv-h3-output-studio,.vv-h3-power-lora,.vv-h3-final-prompt{border-color:var(--h3-soft)!important;box-shadow:0 0 19px var(--h3-glow)!important}
-    .vv-h3-output-studio .vv-progress{background:linear-gradient(90deg,#32194f,#8446b6,#356fa8,#118f8b,#68d91b)!important}
-    .vv-h3-output-studio[data-h3-runtime="active"] .vv-progress{background-size:220% 100%!important;animation:vv-h3-active-head 4.6s ease-in-out infinite!important}
-
-    [data-h3-role="internal"]{--h3-a:#56616b;--h3-b:#4c5b65;--h3-fel:#718068;--h3-soft:rgba(106,119,129,.20);--h3-glow:rgba(67,82,91,.08)}
 
     .vvh3-unified-modern{
       color:#e8eef4!important;
       background:linear-gradient(145deg,#101923,#16232d)!important;
-      border:1px solid rgba(52,188,169,.50)!important;
+      border:1px solid rgba(52,188,169,.40)!important;
       border-radius:12px!important;
       overflow:hidden!important;
-      box-shadow:0 0 0 1px rgba(59,159,209,.10),0 0 24px rgba(21,188,150,.13),0 12px 30px rgba(0,0,0,.35)!important;
+      box-shadow:0 10px 28px rgba(0,0,0,.26),inset 0 1px 0 rgba(255,255,255,.025)!important;
     }
     .vvh3-unified-modern .vvh3-section,.vvh3-unified-modern .vvh3p-section,.vvh3-unified-modern .vv-status,.vvh3-unified-modern .vv-module-card,.vvh3-unified-modern .vv-pass-card,.vvh3-unified-modern .vvh3-preview-stage,.vvh3-unified-modern .vv-video-frame,.vvh3-unified-modern .vvh3m-card,.vvh3-unified-modern .vvh3m-status{
       background:linear-gradient(145deg,#111c26,#152330)!important;
-      border-color:rgba(74,156,178,.27)!important;
+      border-color:rgba(74,156,178,.22)!important;
       border-radius:9px!important;
     }
     .vvh3-unified-modern input,.vvh3-unified-modern select,.vvh3-unified-modern textarea{
       background:#0e1821!important;color:#e8eef4!important;border-color:rgba(71,159,181,.30)!important;border-radius:8px!important;
     }
-    .vvh3-unified-modern .vvh3-status,.vvh3-unified-modern .vvh3-summary,.vvh3-unified-modern .vv-status-detail,.vvh3-unified-modern .vv-foot{
-      background-color:rgba(11,23,31,.72)!important;border-color:rgba(42,169,159,.24)!important;
-    }
+
+    [data-h3-runtime="warning"]{border-color:rgba(210,170,112,.55)!important}
+    [data-h3-runtime="error"]{border-color:rgba(208,123,137,.68)!important;box-shadow:0 0 16px rgba(208,123,137,.15)!important}
 
     @media (prefers-reduced-motion:reduce){
-      [data-h3-runtime="active"].vvh3-themed-shell,[data-h3-runtime="active"].vvh3-themed-preview,[data-h3-runtime="active"].vv-h3-prompt-surface,[data-h3-runtime="active"].vv-h3-final-prompt,[data-h3-runtime="active"].vv-h3-output-studio,[data-h3-runtime="active"].vv-h3-power-lora,
       [data-h3-runtime="active"] .vvh3-head,[data-h3-runtime="active"] .vvh3-preview-head,[data-h3-runtime="active"] .vvh3p-head,[data-h3-runtime="active"] .vv-head,[data-h3-runtime="active"] .vvh3m-head{animation:none!important}
     }
   `;
   document.head.appendChild(style);
 }
 
-function installListeners() {
-  api.addEventListener("execution_start", () => {
-    if (!isH3Graph()) return;
-    h3Active = true;
-    resetRuntime();
-  });
+function installRuntimeSync() {
+  if (listenersInstalled) return;
+  listenersInstalled = true;
+  const deferredSync = () => setTimeout(syncRuntime, 0);
 
-  api.addEventListener("executing", ({ detail }) => {
-    if (!isH3Graph()) return;
-    h3Active = true;
-    const id = topNodeId(detail);
-    if (id == null) {
-      finishActiveNode("done");
-      return;
-    }
-    const node = app.graph?.getNodeById?.(id);
-    if (node) markActive(node);
-  });
+  // These listeners never assign execution state; the earlier H3 design system
+  // owns that state exactly like KREA. We only repaint after it has updated.
+  api.addEventListener("execution_start", deferredSync);
+  api.addEventListener("executing", deferredSync);
+  api.addEventListener("progress", deferredSync);
+  api.addEventListener("executed", deferredSync);
+  api.addEventListener("execution_error", deferredSync);
+  api.addEventListener("execution_interrupted", deferredSync);
+  api.addEventListener("execution_success", deferredSync);
+}
 
-  api.addEventListener("execution_error", () => finishActiveNode("error"));
-  api.addEventListener("execution_interrupted", () => finishActiveNode("warning"));
-  api.addEventListener("execution_success", () => finishActiveNode("done"));
+function applyAll() {
+  if (!isH3Graph()) return;
+  for (const node of currentGraphNodes()) {
+    if (isZenNode(node)) continue;
+    restoreStatic(node, stateFor(node));
+  }
+  internalizeH3Watermark();
+  applyGroups();
+  syncRuntime();
+  app.graph?.setDirtyCanvas?.(true, true);
 }
 
 installCss();
-installListeners();
+installRuntimeSync();
 
 app.registerExtension({
-  name: "VelvetVice.MiniMaxH3.GraphThemeV141ActiveOnly",
+  name: "VelvetVice.MiniMaxH3.KreaStyleRuntimeV142Test",
   nodeCreated(node) {
-    setTimeout(() => {
-      if (!isH3Graph()) return;
-      h3Active = true;
-      applyNodeState(node, "idle");
-      internalizeH3Watermark(node);
-      applyGroups();
-    }, 0);
+    setTimeout(() => { if (isH3Graph() && !isZenNode(node)) { restoreStatic(node, stateFor(node)); syncRuntime(); } }, 0);
   },
   loadedGraphNode(node) {
-    setTimeout(() => {
-      if (!isH3Graph()) return;
-      h3Active = true;
-      applyNodeState(node, "idle");
-      internalizeH3Watermark(node);
-      applyGroups();
-    }, 0);
+    setTimeout(() => { if (isH3Graph() && !isZenNode(node)) { restoreStatic(node, stateFor(node)); syncRuntime(); } }, 0);
   },
   afterConfigureGraph() {
     setTimeout(applyAll, 0);
