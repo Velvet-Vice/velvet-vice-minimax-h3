@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.4.1 — 2026-09-05
+
+Registry update focused on zero-extra-step live preview installation.
+
+### Added
+
+- Lazy automatic download of the MiniMax H3 TAEHV preview decoder for AUTO/MEDIUM live preview
+- SHA256 verification before the decoder is installed into `models/vae_approx/taeh3_decoder.safetensors`
+- Safe temporary download handling, size limit, and non-destructive behavior for existing files
+- Offline/restricted-network fallback to latent2rgb so rendering is never blocked by preview setup
+
+### Updated
+
+- Workflow and Registry metadata normalized to `1.4.1`
+- Frontend/package version markers normalized to `1.4.1`
+- Live-preview Quick Guide updated to reflect automatic TAEHV setup
+
 ## 1.4.0 — 2026-09-05
 
 Initial standalone Velvet Vice MiniMax H3 Registry release.
