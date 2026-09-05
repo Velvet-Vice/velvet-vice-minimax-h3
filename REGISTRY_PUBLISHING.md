@@ -4,7 +4,7 @@ This repository is prepared for the Velvet Vice publisher account.
 
 - Publisher ID: `velvet-vice`
 - Node ID: `velvet-vice-minimax-h3`
-- Version: `1.4.0`
+- Version: `1.4.1`
 - Repository: `https://github.com/Velvet-Vice/velvet-vice-minimax-h3`
 
 ## First GitHub publication
@@ -35,7 +35,7 @@ Before publishing a new version, update all version-bearing locations that are i
 - JavaScript package/version constants that are release-specific
 - README / changelog / release notes
 
-The custom-node workflow metadata for v1.4.0 is already normalized to:
+The custom-node workflow metadata for v1.4.1 is normalized to:
 
 - `cnr_id = "velvet-vice-minimax-h3"`
-- `ver = "1.4.0"`
+- `ver = "1.4.1"`
