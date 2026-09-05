@@ -43,8 +43,7 @@ def ensure_taeh3_decoder() -> tuple[bool, str]:
             return False, f"Existing TAEHV decoder could not be verified: {type(error).__name__}: {error}"
         if digest == TAEH3_SHA256:
             return True, f"TAEHV decoder already installed: {target}"
-        return False, (f"{target} already exists but has a different SHA256. "
-                       "Velvet Vice will not overwrite it automatically.")
+        return False, (f"{target} already exists but has a different SHA256. Velvet Vice will not overwrite it automatically.")
     with _DOWNLOAD_LOCK:
         if target.is_file():
             try:
@@ -53,8 +52,7 @@ def ensure_taeh3_decoder() -> tuple[bool, str]:
                 return False, f"Existing TAEHV decoder could not be verified: {type(error).__name__}: {error}"
             if digest == TAEH3_SHA256:
                 return True, f"TAEHV decoder already installed: {target}"
-            return False, (f"{target} already exists but has a different SHA256. "
-                           "Velvet Vice will not overwrite it automatically.")
+            return False, (f"{target} already exists but has a different SHA256. Velvet Vice will not overwrite it automatically.")
         if _ATTEMPTED_THIS_PROCESS:
             return _LAST_RESULT or (False, "TAEHV automatic download was already attempted in this ComfyUI session.")
         _ATTEMPTED_THIS_PROCESS = True
@@ -62,7 +60,7 @@ def ensure_taeh3_decoder() -> tuple[bool, str]:
         temp = target.with_name(f"{target.name}.download-{os.getpid()}-{threading.get_ident()}")
         try:
             logging.info("VELVET VICE H3 PREVIEW | TAEHV decoder missing; downloading verified preview decoder.")
-            request = Request(TAEH3_URL, headers={"User-Agent": "VelvetViceMiniMaxH3/1.4.4"})
+            request = Request(TAEH3_URL, headers={"User-Agent": "VelvetViceMiniMaxH3/1.4.5"})
             total = 0
             with urlopen(request, timeout=60) as response, temp.open("wb") as handle:
                 while True:

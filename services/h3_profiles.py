@@ -16,7 +16,7 @@ except Exception:  # pragma: no cover
 PROFILE_SCHEMA_VERSION = 1
 STATE_SCHEMA_VERSION = 1
 VALID_SCOPES = {"h3", "lora"}
-VALID_STATE_NAMES = {"system_hub", "director", "output_hub"}
+VALID_STATE_NAMES = {"system_hub", "director", "prompt_director", "output_hub"}
 
 
 def _user_root() -> Path:
@@ -28,8 +28,6 @@ def _user_root() -> Path:
         if callable(getter):
             try:
                 root = Path(getter())
-                # Standard portable installs expose ComfyUI/user here. Keep
-                # Velvet Vice data under default so package updates never touch it.
                 return root / "default" / "velvet_vice"
             except Exception:
                 pass
@@ -79,14 +77,7 @@ def list_profiles(scope: str) -> list[Dict[str, Any]]:
     for path in profile_directory(scope).glob("*.json"):
         try:
             data = _read_json(path)
-            entries.append(
-                {
-                    "name": str(data.get("name") or path.stem),
-                    "scope": str(data.get("scope") or scope),
-                    "schema_version": int(data.get("schema_version") or 0),
-                    "saved_at": str(data.get("saved_at") or ""),
-                }
-            )
+            entries.append({"name": str(data.get("name") or path.stem), "scope": str(data.get("scope") or scope), "schema_version": int(data.get("schema_version") or 0), "saved_at": str(data.get("saved_at") or "")})
         except Exception:
             continue
     return sorted(entries, key=lambda item: item["name"].casefold())
@@ -99,10 +90,7 @@ def load_profile(scope: str, name: str) -> Dict[str, Any]:
     data = _read_json(path)
     schema = int(data.get("schema_version") or 0)
     if schema > PROFILE_SCHEMA_VERSION:
-        raise ValueError(
-            f"Profile schema {schema} is newer than supported schema "
-            f"{PROFILE_SCHEMA_VERSION}."
-        )
+        raise ValueError(f"Profile schema {schema} is newer than supported schema {PROFILE_SCHEMA_VERSION}.")
     data.setdefault("schema_version", PROFILE_SCHEMA_VERSION)
     data.setdefault("scope", scope)
     data.setdefault("payload", {})
@@ -113,13 +101,7 @@ def save_profile(scope: str, name: str, payload: Dict[str, Any]) -> Dict[str, An
     name = _profile_name(name)
     if not isinstance(payload, dict):
         raise ValueError("Profile payload must be an object.")
-    data = {
-        "schema_version": PROFILE_SCHEMA_VERSION,
-        "name": name,
-        "scope": str(scope).lower(),
-        "saved_at": datetime.now(timezone.utc).isoformat(),
-        "payload": payload,
-    }
+    data = {"schema_version": PROFILE_SCHEMA_VERSION, "name": name, "scope": str(scope).lower(), "saved_at": datetime.now(timezone.utc).isoformat(), "payload": payload}
     path = _profile_path(scope, name)
     temp = path.with_suffix(".tmp")
     temp.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
@@ -175,39 +157,22 @@ def _state_path(name: str) -> Path:
 def load_state(name: str) -> Dict[str, Any]:
     path = _state_path(name)
     if not path.is_file():
-        return {
-            "schema_version": STATE_SCHEMA_VERSION,
-            "name": str(name).lower(),
-            "payload": {},
-        }
+        return {"schema_version": STATE_SCHEMA_VERSION, "name": str(name).lower(), "payload": {}}
     data = _read_json(path)
     schema = int(data.get("schema_version") or 0)
     if schema > STATE_SCHEMA_VERSION:
-        raise ValueError(
-            f"State schema {schema} is newer than supported schema "
-            f"{STATE_SCHEMA_VERSION}."
-        )
+        raise ValueError(f"State schema {schema} is newer than supported schema {STATE_SCHEMA_VERSION}.")
     payload = data.get("payload")
     if not isinstance(payload, dict):
         payload = {}
-    return {
-        "schema_version": schema or STATE_SCHEMA_VERSION,
-        "name": str(data.get("name") or name).lower(),
-        "saved_at": str(data.get("saved_at") or ""),
-        "payload": payload,
-    }
+    return {"schema_version": schema or STATE_SCHEMA_VERSION, "name": str(data.get("name") or name).lower(), "saved_at": str(data.get("saved_at") or ""), "payload": payload}
 
 
 def save_state(name: str, payload: Dict[str, Any]) -> Dict[str, Any]:
     if not isinstance(payload, dict):
         raise ValueError("State payload must be an object.")
     path = _state_path(name)
-    data = {
-        "schema_version": STATE_SCHEMA_VERSION,
-        "name": str(name).lower(),
-        "saved_at": datetime.now(timezone.utc).isoformat(),
-        "payload": payload,
-    }
+    data = {"schema_version": STATE_SCHEMA_VERSION, "name": str(name).lower(), "saved_at": datetime.now(timezone.utc).isoformat(), "payload": payload}
     temp = path.with_suffix(".tmp")
     temp.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
     temp.replace(path)
