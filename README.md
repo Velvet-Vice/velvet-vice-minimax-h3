@@ -4,9 +4,11 @@ Standalone Velvet Vice custom-node package for **MiniMax H3 FL2VA image-to-video
 
 ## Scope
 
-This repository is MiniMax H3-only. The public node IDs, UI, HTTP routes and Comfy Registry package use the standalone ID `velvet-vice-minimax-h3`.
+This repository is MiniMax H3-only. The public node IDs, workflow metadata, UI, guides, HTTP routes and Comfy Registry package use the standalone ID `velvet-vice-minimax-h3`.
 
-The tested **v1.4.5 reference workflow is distributed in the Civitai release ZIP**. The Registry package contains the custom nodes required by that workflow.
+The included reference workflow is:
+
+`workflow_examples/VELVET_VICE_MINIMAX_H3_I2V_v1.4.5.json`
 
 ## Main features
 
@@ -19,6 +21,7 @@ The tested **v1.4.5 reference workflow is distributed in the Civitai release ZIP
 - Refine Steps remain directly user-controlled in LIGHT, HIGH and CUSTOM modes
 - LIGHT uses denoise `0.12`; HIGH uses `0.20`; CUSTOM exposes denoise `0.01–0.35`
 - Optional **Preserve Base Audio** keeps pass-1 audio while pass 2 refines the video latent
+- Optional **Decode → Upscale → Re-Encode** path before Pass 2 with adjustable scale
 - H3-native I2VA Vision / Prompt Director with persistent mode across workflow switches
 - VELVET VICE H3 Preflight and live Render Timer monitors
 - `WITH SOUND` / `MUTED · VIDEO ONLY` propagated through prompting, VAE loading, decoding and final output
@@ -32,9 +35,9 @@ The tested **v1.4.5 reference workflow is distributed in the Civitai release ZIP
 - Final memory cleanup and runtime telemetry
 - Automatic PNG export decoded from the actual saved video's terminal frame, with a non-fatal tensor fallback
 - **Static Midnight Violet / Obsidian styling** across the H3 workflow; execution no longer recolors node bars green/teal
-- Freely resizable control surfaces
+- Freely resizable control surfaces, including the H3 POWER LoRA AV panel
 - Strict runtime isolation from the separate Velvet Vice Zen MiniMax H3 package
-- Guided 01 → 07 Civitai workflow layout with inline Quick Guides
+- Guided 01 → 07 workflow layout with inline Quick Guides
 
 ## Quality Refine / Second Sampler
 
@@ -46,7 +49,7 @@ Quality Refine runs after the primary H3 sampling pass and before final VAE deco
 - **CUSTOM** — user-selected Refine Steps `1–16`, denoise `0.01–0.35`
 - **Preserve Base Audio ON** — final audio remains from pass 1 while pass 2 refines video
 
-The second pass uses the same effective H3 model/conditioning with `res_multistep + simple` in the v1.4.5 Civitai workflow.
+The second pass uses the same effective H3 model/conditioning with `res_multistep + simple`. An optional Decode → Upscale → Re-Encode path can prepare a higher-resolution video latent before Pass 2 while rebuilding the H3 AV latent structure.
 
 ## Strongly recommended — Turbo LoRA
 
@@ -70,7 +73,7 @@ Preview tiers:
 - **AUTO / MEDIUM** — TAEHV when installed, otherwise latent2rgb fallback
 - **HIGH** — full MiniMax H3 video VAE, with fallback chain
 
-The portable Civitai release includes `_INSTALL_H3_PREVIEW_TAEHV.cmd`.
+The portable release includes `_INSTALL_H3_PREVIEW_TAEHV.cmd`.
 
 ## Installation
 
@@ -80,7 +83,7 @@ Install:
 
 `velvet-vice-minimax-h3`
 
-Then restart ComfyUI and load the v1.4.5 Civitai workflow.
+Then restart ComfyUI and load the workflow example.
 
 ### Manual GitHub installation
 
