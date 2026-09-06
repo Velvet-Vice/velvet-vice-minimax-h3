@@ -1,5 +1,29 @@
 # Changelog
 
+## 1.4.6 — 2026-09-06
+
+Comfy Registry synchronization release for the final tested MiniMax H3 code state.
+
+### Included
+
+- Final **Quality Refine / Second Sampler** implementation.
+- Optional **Decode → Upscale → Re-Encode** path before pass 2.
+- Correct H3 `[video, audio]` latent reconstruction for the re-encode path.
+- Persistent H3 Vision / Prompt Director mode across workflow switches.
+- Static Midnight Violet / Obsidian execution styling.
+- Final manual resize fix for H3 DOM panels, including **H3 POWER LoRA AV**.
+
+### Compatibility
+
+- Compatible with the public Civitai v1.4.5 workflow.
+- v1.4.6 is used for Registry publication because Registry version 1.4.5 had already been published before the final code synchronization.
+
+### Registry metadata
+
+- Publisher: `velvet-vice`
+- Node ID: `velvet-vice-minimax-h3`
+- Version: `1.4.6`
+
 ## 1.4.5 — 2026-09-06
 
 Quality Refine, re-encode refinement, persistence and static UI release.
