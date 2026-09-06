@@ -4,7 +4,8 @@ const TYPE = "VelvetViceMiniMaxH3SystemHub";
 const STORE = "velvetVice.h3.qualityRefine.v145";
 const FIELDS = [
   "quality_refine_enabled","quality_refine_mode","quality_refine_custom_steps",
-  "quality_refine_custom_denoise","quality_refine_preserve_audio"
+  "quality_refine_custom_denoise","quality_refine_preserve_audio",
+  "quality_refine_reencode_enabled","quality_refine_reencode_scale"
 ];
 function typeOf(node){ return String(node?.comfyClass ?? node?.type ?? ""); }
 function widget(node,name){ return node?.widgets?.find((w)=>w?.name===name); }
@@ -74,10 +75,7 @@ function install(node,retries=0){
   node.__vvQualityRefineV145Installed=true;
   restoreLocal(node);
 
-  for(const name of [
-    "quality_refine_enabled","quality_refine_mode","quality_refine_custom_steps",
-    "quality_refine_custom_denoise","quality_refine_preserve_audio"
-  ]) hideNative(widget(node,name));
+  for(const name of FIELDS) hideNative(widget(node,name));
 
   const refine=document.createElement("div");
   refine.className="vvh3-section vvh3-refine-section";
@@ -89,14 +87,18 @@ function install(node,retries=0){
   const steps=numeric(node,"quality_refine_custom_steps","Refine Steps","1");
   const denoise=numeric(node,"quality_refine_custom_denoise","Custom Denoise","0.01");
   const audio=toggle(node,"quality_refine_preserve_audio","Preserve Base Audio");
+  const reencode=toggle(node,"quality_refine_reencode_enabled","Decode → Upscale → Re-Encode before Pass 2");
+  const scale=numeric(node,"quality_refine_reencode_scale","Re-Encode Scale","0.05");
 
   refine.appendChild(grid(enabled,mode));
   refine.appendChild(grid(steps,denoise));
   refine.appendChild(audio.wrap);
+  refine.appendChild(reencode.wrap);
+  refine.appendChild(scale.wrap);
 
   const state=document.createElement("div");state.className="vvh3-refine-state";refine.appendChild(state);
   const hint=document.createElement("div");hint.className="vvh3-summary";
-  hint.textContent="OFF = only Sampler 1 runs. LIGHT = denoise 0.12. HIGH = denoise 0.20. Refine Steps stay user-controlled in every enabled mode; CUSTOM also unlocks manual denoise.";
+  hint.textContent="OFF = only Sampler 1 runs. LIGHT = denoise 0.12. HIGH = denoise 0.20. Refine Steps stay user-controlled in every enabled mode; CUSTOM unlocks manual denoise. Re-Encode optionally rebuilds a higher-resolution H3 AV latent before Pass 2.";
   refine.appendChild(hint);
 
   const turbo=sectionByTitle(shell,"TURBO / DISTILLED LORA");
@@ -104,25 +106,29 @@ function install(node,retries=0){
   else shell.appendChild(refine);
 
   const sync=()=>{
-    enabled.sync();mode.sync();steps.sync();denoise.sync();audio.sync();
+    enabled.sync();mode.sync();steps.sync();denoise.sync();audio.sync();reencode.sync();scale.sync();
     const on=!!value(node,"quality_refine_enabled",false);
     const m=String(value(node,"quality_refine_mode","LIGHT")).toUpperCase();
+    const re=on&&!!value(node,"quality_refine_reencode_enabled",false);
     mode.input.disabled=!on;
     steps.input.disabled=!on;
     denoise.input.disabled=!on||m!=="CUSTOM";
     audio.input.disabled=!on;
+    reencode.input.disabled=!on;
+    scale.input.disabled=!re;
     refine.classList.toggle("is-enabled",on);
     const s=Number(value(node,"quality_refine_custom_steps",8));
     const d=m==="LIGHT"?0.12:m==="HIGH"?0.20:Number(value(node,"quality_refine_custom_denoise",0.18));
+    const rs=Math.max(1,Math.min(2,Number(value(node,"quality_refine_reencode_scale",1.25))||1.25));
     state.textContent=on
-      ? `ON · ${m} · PASS 2: ${s} steps · denoise ${Number(d).toFixed(2)} · ${value(node,"quality_refine_preserve_audio",true)?"BASE AUDIO PRESERVED":"JOINT AV REFINE"}`
+      ? `ON · ${m} · PASS 2: ${s} steps · denoise ${Number(d).toFixed(2)} · ${value(node,"quality_refine_preserve_audio",true)?"BASE AUDIO PRESERVED":"JOINT AV REFINE"} · ${re?`RE-ENCODE ×${rs.toFixed(2)}`:"DIRECT LATENT"}`
       : "OFF · second sampler is lazy-bypassed · only Sampler 1 runs";
   };
   refine.addEventListener("input",()=>{saveLocal(node);setTimeout(sync,0);});
   refine.addEventListener("change",()=>{saveLocal(node);setTimeout(sync,0);});
   sync();
 
-  node.setSize?.([Math.max(690,node.size?.[0]??0),Math.max(1030,node.size?.[1]??0)]);
+  node.setSize?.([Math.max(690,node.size?.[0]??0),Math.max(1090,node.size?.[1]??0)]);
   const version=[...shell.querySelectorAll(".vvh3-version")][0];
   if(version)version.textContent=String(version.textContent??"").replace(/1\.4\.4/g,"1.4.5");
 }

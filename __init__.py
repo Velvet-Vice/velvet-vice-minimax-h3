@@ -30,6 +30,11 @@ from .nodes import (
     VelvetViceMiniMaxH3GhostAnalyzer,
     VelvetViceMiniMaxH3TemporalAntiGhost,
     VelvetViceMiniMaxH3AVRefineMerge,
+    VelvetViceMiniMaxH3AVRefineReencodeMerge,
+    VelvetViceMiniMaxH3ConditioningRefineSwitch,
+    VelvetViceMiniMaxH3ReencodeAVPrepare,
+    VelvetViceMiniMaxH3ImageResizeExact,
+    VelvetViceMiniMaxH3RefineResolutionPlan,
     VelvetViceMiniMaxH3LatentRefineSwitch,
 )
 from .services.interrupt_cleanup import install_interruption_cleanup_hook
@@ -71,6 +76,11 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "VelvetViceMiniMaxH3GhostAnalyzer": "VELVET VICE MiniMax H3 — Ghost Analyzer",
     "VelvetViceMiniMaxH3TemporalAntiGhost": "VELVET VICE MiniMax H3 — Temporal Anti-Ghost",
     "VelvetViceMiniMaxH3AVRefineMerge": "VELVET VICE MiniMax H3 — Quality Refine AV Merge",
+    "VelvetViceMiniMaxH3AVRefineReencodeMerge": "VELVET VICE MiniMax H3 — Quality Refine Re-Encode AV Merge",
+    "VelvetViceMiniMaxH3RefineResolutionPlan": "VELVET VICE MiniMax H3 — Refine Resolution Plan",
+    "VelvetViceMiniMaxH3ImageResizeExact": "VELVET VICE MiniMax H3 — Refine Exact Resize",
+    "VelvetViceMiniMaxH3ReencodeAVPrepare": "VELVET VICE MiniMax H3 — Re-Encode AV Prepare",
+    "VelvetViceMiniMaxH3ConditioningRefineSwitch": "VELVET VICE MiniMax H3 — Refine Conditioning Switch",
     "VelvetViceMiniMaxH3LatentRefineSwitch": "VELVET VICE MiniMax H3 — Quality Refine Lazy Switch",
 }
 

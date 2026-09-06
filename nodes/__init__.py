@@ -40,6 +40,11 @@ from .minimax_h3_public import (
 )
 from .quality_refine import (
     VelvetViceMiniMaxH3AVRefineMerge,
+    VelvetViceMiniMaxH3AVRefineReencodeMerge,
+    VelvetViceMiniMaxH3ConditioningRefineSwitch,
+    VelvetViceMiniMaxH3ReencodeAVPrepare,
+    VelvetViceMiniMaxH3ImageResizeExact,
+    VelvetViceMiniMaxH3RefineResolutionPlan,
     VelvetViceMiniMaxH3LatentRefineSwitch,
 )
 from . import prompt_state_routes_v145 as _prompt_state_routes_v145  # route registration side effect

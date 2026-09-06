@@ -27,17 +27,23 @@ class VelvetViceMiniMaxH3SystemHub(_BaseSystemHub):
                     "FLOAT", {"default": 0.18, "min": 0.01, "max": 0.35, "step": 0.01}
                 )
                 merged["quality_refine_preserve_audio"] = ("BOOLEAN", {"default": True})
+                merged["quality_refine_reencode_enabled"] = ("BOOLEAN", {"default": False})
+                merged["quality_refine_reencode_scale"] = (
+                    "FLOAT", {"default": 1.25, "min": 1.0, "max": 2.0, "step": 0.05}
+                )
         base["required"] = merged
         return base
 
     RETURN_TYPES = tuple(_BaseSystemHub.RETURN_TYPES) + (
-        "BOOLEAN", "INT", "FLOAT", "BOOLEAN", "STRING"
+        "BOOLEAN", "INT", "FLOAT", "BOOLEAN", "BOOLEAN", "FLOAT", "STRING"
     )
     RETURN_NAMES = tuple(_BaseSystemHub.RETURN_NAMES) + (
         "refine_enabled",
         "refine_steps",
         "refine_denoise",
         "refine_preserve_audio",
+        "refine_reencode_enabled",
+        "refine_reencode_scale",
         "refine_status",
     )
     DESCRIPTION = (
@@ -63,6 +69,8 @@ class VelvetViceMiniMaxH3SystemHub(_BaseSystemHub):
         quality_refine_custom_steps=8,
         quality_refine_custom_denoise=0.18,
         quality_refine_preserve_audio=True,
+        quality_refine_reencode_enabled=False,
+        quality_refine_reencode_scale=1.25,
         strict_turbo_compatibility=True,
         turbo_bypass_on_missing=True,
         native_weight_dtype="default",
@@ -114,13 +122,28 @@ class VelvetViceMiniMaxH3SystemHub(_BaseSystemHub):
             status = f"QUALITY REFINE ON · CUSTOM | pass 2: {steps} steps | denoise {denoise:.2f}"
 
         preserve = bool(quality_refine_preserve_audio)
+        reencode = bool(quality_refine_reencode_enabled) and enabled
+        reencode_scale = max(1.0, min(2.0, float(quality_refine_reencode_scale)))
+
         if enabled:
             status += " | " + ("BASE AUDIO PRESERVED" if preserve else "JOINT AV REFINE")
+            if reencode:
+                status += f" | DECODE→UPSCALE→RE-ENCODE ×{reencode_scale:.2f}"
+            else:
+                status += " | DIRECT LATENT REFINE"
 
         if len(results) > 4:
             ui["status"] = [f"{results[4]} | {status}"]
 
         return {
             "ui": ui,
-            "result": results + (enabled, steps, denoise, preserve, status),
+            "result": results + (
+                enabled,
+                steps,
+                denoise,
+                preserve,
+                reencode,
+                reencode_scale,
+                status,
+            ),
         }
