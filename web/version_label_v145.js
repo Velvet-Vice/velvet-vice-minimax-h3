@@ -12,13 +12,18 @@ const TYPES = new Set([
   "VelvetViceMiniMaxH3OutputHub",
 ]);
 
+const PUBLIC_VERSION = "1.5.0";
+const OLD_VERSIONS = ["1.4.4","1.4.5","1.4.6"];
+
 function typeOf(node){return String(node?.comfyClass??node?.type??"");}
 function patchText(root){
   if(!root)return;
   const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
   const nodes=[]; while(walker.nextNode())nodes.push(walker.currentNode);
   for(const n of nodes){
-    if(n.nodeValue?.includes("1.4.4"))n.nodeValue=n.nodeValue.replaceAll("1.4.4","1.4.5");
+    let value=String(n.nodeValue??"");
+    for(const old of OLD_VERSIONS)value=value.replaceAll(old,PUBLIC_VERSION);
+    n.nodeValue=value;
   }
 }
 function patch(node){
@@ -32,7 +37,7 @@ function patch(node){
 }
 function scan(){for(const n of app.graph?._nodes??[])patch(n);}
 app.registerExtension({
-  name:"VelvetVice.MiniMaxH3.VersionLabelV145",
+  name:"VelvetVice.MiniMaxH3.VersionLabelV150",
   nodeCreated(n){setTimeout(()=>patch(n),100);},
   loadedGraphNode(n){setTimeout(()=>patch(n),100);},
   afterConfigureGraph(){setTimeout(scan,150);setTimeout(scan,800);}

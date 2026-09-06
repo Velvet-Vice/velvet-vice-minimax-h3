@@ -4,9 +4,9 @@ Standalone Velvet Vice custom-node package for **MiniMax H3 FL2VA image-to-video
 
 ## Scope
 
-This repository is MiniMax H3-only. The public node IDs, UI, HTTP routes and Comfy Registry package use the standalone ID `velvet-vice-minimax-h3`.
+This repository is MiniMax H3-only. The public node IDs, workflow metadata, UI, guides, HTTP routes and Comfy Registry package use the standalone ID `velvet-vice-minimax-h3`.
 
-The tested **v1.4.5 Civitai reference workflow** is compatible with the current **v1.4.6 Registry package**. v1.4.6 is the Registry synchronization release containing the final tested v1.4.5 code state.
+The current public workflow and package version is **v1.5.0**.
 
 ## Main features
 
@@ -33,7 +33,7 @@ The tested **v1.4.5 Civitai reference workflow** is compatible with the current 
 - Final memory cleanup and runtime telemetry
 - Automatic PNG export decoded from the actual saved video's terminal frame, with a non-fatal tensor fallback
 - **Static Midnight Violet / Obsidian styling** across the H3 workflow; execution no longer recolors node bars green/teal
-- Freely resizable control surfaces, including the H3 POWER LoRA AV panel
+- Freely resizable control surfaces, including the **H3 POWER LoRA AV** panel
 - Strict runtime isolation from the separate Velvet Vice Zen MiniMax H3 package
 
 ## Quality Refine / Second Sampler
@@ -46,7 +46,7 @@ Quality Refine runs after the primary H3 sampling pass and before final VAE deco
 - **CUSTOM** — user-selected Refine Steps `1–16`, denoise `0.01–0.35`
 - **Preserve Base Audio ON** — final audio remains from pass 1 while pass 2 refines video
 
-The second pass uses the same effective H3 model/conditioning with `res_multistep + simple`. The optional Decode → Upscale → Re-Encode path prepares a higher-resolution video latent before Pass 2 while rebuilding the H3 `[video, audio]` latent structure.
+The second pass uses the same effective H3 model/conditioning with `res_multistep + simple`. An optional Decode → Upscale → Re-Encode path can prepare a higher-resolution video latent before Pass 2 while rebuilding the H3 `[video, audio]` latent structure.
 
 ## Strongly recommended — Turbo LoRA
 
@@ -70,8 +70,6 @@ Preview tiers:
 - **AUTO / MEDIUM** — TAEHV when installed, otherwise latent2rgb fallback
 - **HIGH** — full MiniMax H3 video VAE, with fallback chain
 
-The portable Civitai release includes `_INSTALL_H3_PREVIEW_TAEHV.cmd`.
-
 ## Installation
 
 ### Comfy Registry / Manager
@@ -80,7 +78,7 @@ Install:
 
 `velvet-vice-minimax-h3`
 
-Then restart ComfyUI and load the v1.4.5 Civitai workflow.
+Then restart ComfyUI and load the current v1.5.0 Civitai workflow.
 
 ### Manual GitHub installation
 
@@ -94,5 +92,5 @@ Restart ComfyUI afterwards.
 
 - Publisher: `velvet-vice`
 - Node ID: `velvet-vice-minimax-h3`
-- Version: `1.4.6`
+- Version: `1.5.0`
 - Display name: `VELVET VICE — MiniMax H3`
