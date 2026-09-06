@@ -1,6 +1,6 @@
 [project]
 name = "velvet-vice-minimax-h3"
-version = "1.4.5"
+version = "1.4.6"
 description = "Velvet Vice MiniMax H3 image-to-video custom nodes with Native/GGUF routing, Quality Refine second sampling, persistent prompting, live preview and finishing tools."
 license = { file = "LICENSE" }
 requires-python = ">=3.10"
