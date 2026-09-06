@@ -4,11 +4,9 @@ Standalone Velvet Vice custom-node package for **MiniMax H3 FL2VA image-to-video
 
 ## Scope
 
-This repository is MiniMax H3-only. The public node IDs, workflow metadata, UI, guides, HTTP routes and Comfy Registry package use the standalone ID `velvet-vice-minimax-h3`.
+This repository is MiniMax H3-only. The public node IDs, UI, HTTP routes and Comfy Registry package use the standalone ID `velvet-vice-minimax-h3`.
 
-The included reference workflow is:
-
-`workflow_examples/VELVET_VICE_MINIMAX_H3_I2V_v1.4.5.json`
+The tested **v1.4.5 reference workflow is distributed in the Civitai release ZIP**. This GitHub repository contains the custom nodes required by that workflow.
 
 ## Main features
 
@@ -37,7 +35,6 @@ The included reference workflow is:
 - **Static Midnight Violet / Obsidian styling** across the H3 workflow; execution no longer recolors node bars green/teal
 - Freely resizable control surfaces, including the H3 POWER LoRA AV panel
 - Strict runtime isolation from the separate Velvet Vice Zen MiniMax H3 package
-- Guided 01 → 07 workflow layout with inline Quick Guides
 
 ## Quality Refine / Second Sampler
 
@@ -49,7 +46,7 @@ Quality Refine runs after the primary H3 sampling pass and before final VAE deco
 - **CUSTOM** — user-selected Refine Steps `1–16`, denoise `0.01–0.35`
 - **Preserve Base Audio ON** — final audio remains from pass 1 while pass 2 refines video
 
-The second pass uses the same effective H3 model/conditioning with `res_multistep + simple`. An optional Decode → Upscale → Re-Encode path can prepare a higher-resolution video latent before Pass 2 while rebuilding the H3 AV latent structure.
+The second pass uses the same effective H3 model/conditioning with `res_multistep + simple`. The optional Decode → Upscale → Re-Encode path prepares a higher-resolution video latent before Pass 2 while rebuilding the H3 `[video, audio]` latent structure.
 
 ## Strongly recommended — Turbo LoRA
 
@@ -73,7 +70,7 @@ Preview tiers:
 - **AUTO / MEDIUM** — TAEHV when installed, otherwise latent2rgb fallback
 - **HIGH** — full MiniMax H3 video VAE, with fallback chain
 
-The portable release includes `_INSTALL_H3_PREVIEW_TAEHV.cmd`.
+The portable Civitai release includes `_INSTALL_H3_PREVIEW_TAEHV.cmd`.
 
 ## Installation
 
@@ -83,7 +80,7 @@ Install:
 
 `velvet-vice-minimax-h3`
 
-Then restart ComfyUI and load the workflow example.
+Then restart ComfyUI and load the v1.4.5 Civitai workflow.
 
 ### Manual GitHub installation
 
