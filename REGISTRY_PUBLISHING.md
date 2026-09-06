@@ -4,7 +4,7 @@ This repository is prepared for the Velvet Vice publisher account.
 
 - Publisher ID: `velvet-vice`
 - Node ID: `velvet-vice-minimax-h3`
-- Version: `1.4.6`
+- Version: `1.5.0`
 - Repository: `https://github.com/Velvet-Vice/velvet-vice-minimax-h3`
 
 ## Automatic Comfy Registry publishing
@@ -17,19 +17,15 @@ Required repository secret:
 
 The secret must contain a Comfy Registry publishing API key for publisher `velvet-vice`.
 
-## Release consistency checklist
+## Release consistency rule
 
-Before publishing a new version, update all version-bearing locations intentionally coupled to the package release:
+Civitai ZIP, workflow metadata, GitHub package and Comfy Registry must use the same public version.
 
-- `pyproject.toml`
-- `version.py`
-- JavaScript package/version constants when release-specific
-- README / changelog / release notes
+Current public version: **1.5.0**
 
-## v1.4.6 Registry synchronization
+For the current workflow use:
 
-Registry v1.4.5 had already been published before the final v1.4.5 Civitai/GitHub code synchronization. Therefore the finalized code is published to Comfy Registry as **v1.4.6** instead of attempting to overwrite the existing v1.4.5 Registry package.
+- `cnr_id = "velvet-vice-minimax-h3"`
+- `ver = "1.5.0"`
 
-The public Civitai v1.4.5 workflow remains compatible with Registry v1.4.6.
-
-Do not mix isolated test-addon files into the public package.
+Do not reuse an already-published Registry version and do not mix isolated test-addon files into the public package.
